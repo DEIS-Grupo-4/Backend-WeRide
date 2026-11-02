@@ -14,6 +14,8 @@ import org.mockito.InjectMocks;
 
 import java.util.Optional;
 
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
@@ -30,33 +32,41 @@ class AccountCommandServiceImplTest {
 
     @Test
     void signInWithWrongPassword_throwsAndNeverGeneratesToken() {
+
+        // Arrange
         var account = new Account("auditor@weride.com", "hashed-password");
+        var command = new SignInCommand("auditor@weride.com", "malo");
+
         when(accountRepository.existsByUserName("auditor@weride.com")).thenReturn(true);
         when(accountRepository.findByUserName("auditor@weride.com")).thenReturn(Optional.of(account));
         when(hashingService.matches("malo", "hashed-password")).thenReturn(false);
 
-        var command = new SignInCommand("auditor@weride.com", "malo");
-
+        // Act
         var exception = assertThrows(RuntimeException.class, () -> service.handle(command));
+
+        // Assert
         assertEquals("Invalid credentials", exception.getMessage());
+        verify(tokenService, never()).generateToken(anyString());
     }
 
     @Test
     void signInWithCorrectPassword_returnsAccountAndToken() {
 
         // Arrange
-
         var account = new Account("auditor@weride.com", "hashed-password");
+        var command = new SignInCommand("auditor@weride.com", "correct-password");
+
         when(accountRepository.existsByUserName("auditor@weride.com")).thenReturn(true);
         when(accountRepository.findByUserName("auditor@weride.com")).thenReturn(Optional.of(account));
         when(hashingService.matches("correct-password", "hashed-password")).thenReturn(true);
         when(tokenService.generateToken("auditor@weride.com")).thenReturn("jwt-token-123");
 
-        var command = new SignInCommand("auditor@weride.com", "correct-password");
-
+        // Act
         var result = service.handle(command);
 
-        assertEquals(true, result.isPresent());
+        // Assert
+        assertTrue(result.isPresent());
+        assertSame(account, result.get().getLeft());
         assertEquals("jwt-token-123", result.get().getRight());
     }
 }
