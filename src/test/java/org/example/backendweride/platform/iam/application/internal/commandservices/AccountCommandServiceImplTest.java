@@ -4,6 +4,7 @@ import org.example.backendweride.platform.iam.application.internal.outboundservi
 import org.example.backendweride.platform.iam.application.internal.outboundservices.tokens.TokenService;
 import org.example.backendweride.platform.iam.domain.model.aggregates.Account;
 import org.example.backendweride.platform.iam.domain.model.commands.SignInCommand;
+import org.example.backendweride.platform.iam.domain.model.commands.SignUpCommand;
 import org.example.backendweride.platform.iam.infrastructure.persistence.jpa.repositories.AccountRepository;
 import org.example.backendweride.platform.profile.interfaces.acl.ProfileContextFacade;
 import org.junit.jupiter.api.Test;
@@ -69,4 +70,38 @@ class AccountCommandServiceImplTest {
         assertSame(account, result.get().getLeft());
         assertEquals("jwt-token-123", result.get().getRight());
     }
+
+    @Test
+    void SignInWithUnknownUser_throwsUserNotFound() {
+
+        // Arrange
+        var command = new SignInCommand("missing", "password");
+
+        when(accountRepository.existsByUserName("missing")).thenReturn(false);
+
+        // Act
+        var exception = assertThrows(RuntimeException.class, () -> service.handle(command));
+
+        // Assert
+        assertEquals("User not found", exception.getMessage());
+        verifyNoInteractions(tokenService);
+    }
+
+    @Test
+    void SignUpWithExistentUsername_throwsUserAlreadyExists() {
+
+        // Arrange
+        var command = new SignUpCommand("duplicate", "password");
+
+        when(accountRepository.existsByUserName("duplicate")).thenReturn(true);
+
+        // Act
+        var exception = assertThrows(RuntimeException.class, () -> service.handle(command));
+
+        // Assert
+        assertEquals("User already exists", exception.getMessage());
+        verify(accountRepository, never()).save(any(Account.class));
+        verifyNoInteractions(profileContextFacade);
+    }
+
 }
