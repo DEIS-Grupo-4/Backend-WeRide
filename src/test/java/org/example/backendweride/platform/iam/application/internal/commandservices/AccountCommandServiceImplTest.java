@@ -75,9 +75,9 @@ class AccountCommandServiceImplTest {
     void SignInWithUnknownUser_throwsUserNotFound() {
 
         // Arrange
-        var command = new SignInCommand("missing", "password");
+        var command = new SignInCommand("missing@weride.com", "password");
 
-        when(accountRepository.existsByUserName("missing")).thenReturn(false);
+        when(accountRepository.existsByUserName("missing@weride.com")).thenReturn(false);
 
         // Act
         var exception = assertThrows(RuntimeException.class, () -> service.handle(command));
@@ -91,9 +91,9 @@ class AccountCommandServiceImplTest {
     void SignUpWithExistentUsername_throwsUserAlreadyExists() {
 
         // Arrange
-        var command = new SignUpCommand("duplicate", "password");
+        var command = new SignUpCommand("duplicate@weride.com", "password");
 
-        when(accountRepository.existsByUserName("duplicate")).thenReturn(true);
+        when(accountRepository.existsByUserName("duplicate@weride.com")).thenReturn(true);
 
         // Act
         var exception = assertThrows(RuntimeException.class, () -> service.handle(command));
@@ -103,5 +103,4 @@ class AccountCommandServiceImplTest {
         verify(accountRepository, never()).save(any(Account.class));
         verifyNoInteractions(profileContextFacade);
     }
-
 }
