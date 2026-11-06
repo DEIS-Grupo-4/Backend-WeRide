@@ -35,6 +35,8 @@ class PlanCommandServiceImplTest {
         // Arrange
         var command = sampleCommand("Premium", 29.99f);
 
+        when(planRepository.save(any(Plan.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
         // Act
         var result = service.handle(command);
 
@@ -65,12 +67,14 @@ class PlanCommandServiceImplTest {
 
         // Arrange
         var planId = 99L;
+        when(planRepository.existsById(planId)).thenReturn(false);
 
         // Act
         var result = service.handle(planId);
 
         // Assert
         assertFalse(result);
+        verify(planRepository).existsById(planId);
         verify(planRepository, never()).deleteById(anyLong());
     }
 
