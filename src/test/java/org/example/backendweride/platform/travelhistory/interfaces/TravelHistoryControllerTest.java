@@ -7,44 +7,99 @@ import org.example.backendweride.platform.travelhistory.domain.services.commands
 import org.example.backendweride.platform.travelhistory.domain.services.queryservices.TravelHistoryQueryService;
 import org.example.backendweride.platform.travelhistory.interfaces.resources.TravelHistoryResource;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
+@ExtendWith(MockitoExtension.class)
 class TravelHistoryControllerTest {
 
-    private final TravelHistoryCommandService travelHistoryCommandService = mock(TravelHistoryCommandService.class);
-    private final TravelHistoryQueryService travelHistoryQueryService = mock(TravelHistoryQueryService.class);
-    private final AuthenticatedAccountProvider authenticatedAccountProvider = mock(AuthenticatedAccountProvider.class);
+    @Mock
+    private TravelHistoryCommandService travelHistoryCommandService;
 
-    private final TravelHistoryController controller = new TravelHistoryController(
-            travelHistoryCommandService, travelHistoryQueryService, authenticatedAccountProvider);
+    @Mock
+    private TravelHistoryQueryService travelHistoryQueryService;
 
-    @Test
-    void getAllTravelHistories_returnsTravelHistoryResourceNotEntity() {
-        when(authenticatedAccountProvider.isCurrentUserAdmin()).thenReturn(true);
-        when(travelHistoryQueryService.handle(any(GetAllTravelsHistory.class)))
-                .thenReturn(Optional.of(List.<TravelHistoryResource>of()));
+    @Mock
+    private AuthenticatedAccountProvider authenticatedAccountProvider;
 
-        var response = controller.getAllTravelHistories();
+    @InjectMocks
+    private TravelHistoryController controller;
 
-        assertEquals(HttpStatus.OK, response.getStatusCode());
+    private TravelHistoryResource sampleTravelHistory() {
+        return new TravelHistoryResource(1L, 1L, "San Isidro", "Scooter", "travel-image.jpg", "30 minutos", "5 km", null);
     }
 
     @Test
-    void getTravelHistoryById_returnsTravelHistoryResourceNotEntity() {
-        when(authenticatedAccountProvider.getCurrentAccountId()).thenReturn(1L);
-        when(travelHistoryQueryService.handle(any(GetTravelsHistoryById.class)))
-                .thenReturn(Optional.of(List.<TravelHistoryResource>of()));
+    void getAllTravelHistories_returnsResources_whenCurrentUserIsAdmin() {
 
+        // Arrange
+        var history = sampleTravelHistory();
+
+        when(authenticatedAccountProvider.isCurrentUserAdmin()).thenReturn(true);
+        when(travelHistoryQueryService.handle(any(GetAllTravelsHistory.class))).thenReturn(Optional.of(List.of(history)));
+
+        // Act
+        var response = controller.getAllTravelHistories();
+
+        // Assert
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertNotNull(response.getBody());
+        assertEquals(1, response.getBody().size());
+        assertEquals(history, response.getBody().get(0));
+
+        verify(authenticatedAccountProvider).isCurrentUserAdmin();
+        verify(travelHistoryQueryService).handle(any(GetAllTravelsHistory.class));
+    }
+
+    @Test
+    void getAllTravelHistories_returnsForbidden_whenCurrentUserIsNotAdmin() {
+
+        // Arrange
+        when(authenticatedAccountProvider.isCurrentUserAdmin()).thenReturn(false);
+
+        // Act
+        var response = controller.getAllTravelHistories();
+
+        // Assert
+        assertEquals(HttpStatus.FORBIDDEN, response.getStatusCode());
+
+        verify(authenticatedAccountProvider).isCurrentUserAdmin();
+        verifyNoInteractions(travelHistoryQueryService);
+    }
+
+    @Test
+    void getTravelHistoryById_returnsResources_whenUserOwnsHistory() {
+
+        // Arrange
+        var history = sampleTravelHistory();
+
+        when(authenticatedAccountProvider.getCurrentAccountId()).thenReturn(1L);
+        when(travelHistoryQueryService.handle(any(GetTravelsHistoryById.class))).thenReturn(Optional.of(List.of(history)));
+
+        // Act
         var response = controller.getTravelHistoryById(1L);
 
+        // Assert
         assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertNotNull(response.getBody());
+        assertEquals(1, response.getBody().size());
+        assertEquals(history, response.getBody().get(0));
+
+        ArgumentCaptor<GetTravelsHistoryById> captor = ArgumentCaptor.forClass(GetTravelsHistoryById.class);
+
+        verify(travelHistoryQueryService).handle(captor.capture());
+        assertEquals(1L, captor.getValue().id());
+        verify(authenticatedAccountProvider).getCurrentAccountId();
     }
 }
