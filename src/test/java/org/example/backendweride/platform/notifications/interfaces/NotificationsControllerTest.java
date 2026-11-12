@@ -1,64 +1,111 @@
 package org.example.backendweride.platform.notifications.interfaces;
 
 import org.example.backendweride.platform.iam.application.internal.outboundservices.security.AuthenticatedAccountProvider;
+import org.example.backendweride.platform.notifications.domain.model.aggregates.Notification;
+import org.example.backendweride.platform.notifications.domain.model.commands.MarkNotificationAsReadCommand;
 import org.example.backendweride.platform.notifications.domain.model.queries.GetAllNotificationsByUserIdQuery;
+import org.example.backendweride.platform.notifications.domain.model.queries.GetNotificationByIdQuery;
 import org.example.backendweride.platform.notifications.domain.services.NotificationCommandService;
 import org.example.backendweride.platform.notifications.domain.services.NotificationQueryService;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.http.HttpStatus;
 
 import java.util.List;
+import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
+@ExtendWith(MockitoExtension.class)
 class NotificationsControllerTest {
 
-    private final NotificationCommandService notificationCommandService = mock(NotificationCommandService.class);
-    private final NotificationQueryService notificationQueryService = mock(NotificationQueryService.class);
-    private final AuthenticatedAccountProvider authenticatedAccountProvider = mock(AuthenticatedAccountProvider.class);
+    @Mock
+    private NotificationCommandService notificationCommandService;
 
-    private final NotificationsController controller = new NotificationsController(
-            notificationCommandService, notificationQueryService, authenticatedAccountProvider);
+    @Mock
+    private NotificationQueryService notificationQueryService;
+
+    @Mock
+    private AuthenticatedAccountProvider authenticatedAccountProvider;
+
+    @InjectMocks
+    private NotificationsController controller;
 
     @Test
     void getAllNotificationsByUserId_usesAuthenticatedUserId_notQueryParam() {
+
+        // Arrange
         when(authenticatedAccountProvider.getCurrentAccountId()).thenReturn(42L);
         when(notificationQueryService.handle(any(GetAllNotificationsByUserIdQuery.class))).thenReturn(List.of());
 
-        controller.getAllNotificationsByUserId("999");
+        // Act
+        var response = controller.getAllNotificationsByUserId("999");
+
+        // Assert
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertNotNull(response.getBody());
+        assertTrue(response.getBody().isEmpty());
 
         ArgumentCaptor<GetAllNotificationsByUserIdQuery> captor = ArgumentCaptor.forClass(GetAllNotificationsByUserIdQuery.class);
+
         verify(notificationQueryService).handle(captor.capture());
+
         assertEquals("42", captor.getValue().userId());
+
+        verify(authenticatedAccountProvider).getCurrentAccountId();
     }
 
     @Test
     void getNotificationById_returnsNotFound_whenNotificationBelongsToAnotherUser() {
-        when(authenticatedAccountProvider.getCurrentAccountId()).thenReturn(42L);
-        var foreignNotification = mock(org.example.backendweride.platform.notifications.domain.model.aggregates.Notification.class);
-        when(foreignNotification.getUserId()).thenReturn("999");
-        when(notificationQueryService.handle(any(org.example.backendweride.platform.notifications.domain.model.queries.GetNotificationByIdQuery.class)))
-                .thenReturn(java.util.Optional.of(foreignNotification));
 
+        // Arrange
+        Notification foreignNotification = mock(Notification.class);
+
+        when(authenticatedAccountProvider.getCurrentAccountId()).thenReturn(42L);
+        when(foreignNotification.getUserId()).thenReturn("999");
+        when(notificationQueryService.handle(any(GetNotificationByIdQuery.class))).thenReturn(Optional.of(foreignNotification));
+
+        // Act
         var response = controller.getNotificationById("notif-001");
 
-        assertEquals(404, response.getStatusCode().value());
+        // Assert
+        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+
+        ArgumentCaptor<GetNotificationByIdQuery> captor = ArgumentCaptor.forClass(GetNotificationByIdQuery.class);
+
+        verify(notificationQueryService).handle(captor.capture());
+
+        assertEquals("notif-001", captor.getValue().publicId());
+
+        verify(authenticatedAccountProvider).getCurrentAccountId();
     }
 
     @Test
     void markAsRead_passesAuthenticatedUserId() {
+
+        // Arrange
         when(authenticatedAccountProvider.getCurrentAccountId()).thenReturn(42L);
 
-        controller.markAsRead("notif-001");
+        ArgumentCaptor<MarkNotificationAsReadCommand> captor = ArgumentCaptor.forClass(MarkNotificationAsReadCommand.class);
 
-        ArgumentCaptor<org.example.backendweride.platform.notifications.domain.model.commands.MarkNotificationAsReadCommand> captor =
-                ArgumentCaptor.forClass(org.example.backendweride.platform.notifications.domain.model.commands.MarkNotificationAsReadCommand.class);
+        // Act
+        var response = controller.markAsRead("notif-001");
+
+        // Assert
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals("Notification marked as read", response.getBody());
+
         verify(notificationCommandService).handle(captor.capture());
+
         assertEquals("42", captor.getValue().userId());
         assertEquals("notif-001", captor.getValue().notificationId());
+
+        verify(authenticatedAccountProvider).getCurrentAccountId();
     }
 }
