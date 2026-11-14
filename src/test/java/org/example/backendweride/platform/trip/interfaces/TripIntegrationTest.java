@@ -38,8 +38,17 @@ class TripIntegrationTest {
         mockMvc.perform(post("/api/v1/authentication/sign-up").contentType(MediaType.APPLICATION_JSON).content("""
                 {"username":"%s","password":"Strong123!"}""".formatted(username))).andExpect(status().isCreated());
 
-        String response = mockMvc.perform(post("/api/v1/authentication/sign-in").contentType(MediaType.APPLICATION_JSON).content("""
-                {"username":"%s","password":"Strong123!"}""".formatted(username))).andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
+        String response = mockMvc.perform(
+                        post("/api/v1/authentication/sign-in")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content("""
+                        {"username":"%s","password":"Strong123!"}
+                        """.formatted(username))
+                )
+                .andExpect(status().isOk())
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
 
         String token = objectMapper.readTree(response).path("token").asText();
         assertFalse(token.isBlank(), "El inicio de sesión debe devolver un JWT");
@@ -50,10 +59,49 @@ class TripIntegrationTest {
 
         String start = Instant.now().minusSeconds(1800).toString();
         String end = Instant.now().toString();
-        String payload = """
-                {"bookingId": 7654321,"userId": "user-id-forged-by-client","vehicleId": 101,"startLocationId": 201,"endLocationId": 202,"route": "Integration test route","routeCoordinates": [{"lat": -12.0464, "lng": -77.0428}],"startDate": "%s","endDate": "%s","duration": 30,"distance": 5.5,"averageSpeed": 11.0,"maxSpeed": 20.0,"totalCost": 15.0,"carbonSaved": 0.5,"caloriesBurned": 50,"weather": "sunny","temperature": 22,"status": "completed","incidentReports": ["No incidents"],"photos": ["test/trip-photo.jpg"]}""".formatted(start, end);
 
-        String response = mockMvc.perform(post("/api/v1/trips").header("Authorization", "Bearer " + token).contentType(MediaType.APPLICATION_JSON).content(payload)).andExpect(status().isCreated()).andExpect(jsonPath("$.id").isNotEmpty()).andReturn().getResponse().getContentAsString();
+        String payload = """
+        {
+          "bookingId": 7654321,
+          "userId": "user-id-forged-by-client",
+          "vehicleId": 101,
+          "startLocationId": 201,
+          "endLocationId": 202,
+          "route": "Integration test route",
+          "routeCoordinates": [
+            {
+              "lat": -12.0464,
+              "lng": -77.0428
+            }
+          ],
+          "startDate": "%s",
+          "endDate": "%s",
+          "duration": 30,
+          "distance": 5.5,
+          "averageSpeed": 11.0,
+          "maxSpeed": 20.0,
+          "totalCost": 15.0,
+          "carbonSaved": 0.5,
+          "caloriesBurned": 50,
+          "weather": "sunny",
+          "temperature": 22,
+          "status": "completed",
+          "incidentReports": ["No incidents"],
+          "photos": ["test/trip-photo.jpg"]
+        }
+        """.formatted(start, end);
+
+        String response = mockMvc.perform(
+                        post("/api/v1/trips")
+                                .header("Authorization", "Bearer " + token)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(payload)
+                )
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.id").isNotEmpty())
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
 
         JsonNode created = objectMapper.readTree(response);
         return created.path("id").asLong();
@@ -70,9 +118,26 @@ class TripIntegrationTest {
 
         assertEquals(expectedUserId, trip.getUserId(), "El controlador debe ignorar el userId enviado por el cliente");
 
-        mockMvc.perform(get("/api/v1/trips").header("Authorization", "Bearer " + token)).andExpect(status().isOk()).andExpect(jsonPath("$[0].id").value(tripId)).andExpect(jsonPath("$[0].userId").value(expectedUserId));
-        mockMvc.perform(get("/api/v1/trips/" + tripId).header("Authorization", "Bearer " + token)).andExpect(status().isOk()).andExpect(jsonPath("$.id").value(tripId));
-        mockMvc.perform(delete("/api/v1/trips/" + tripId).header("Authorization", "Bearer " + token)).andExpect(status().isNoContent());
+        mockMvc.perform(
+                        get("/api/v1/trips")
+                                .header("Authorization", "Bearer " + token)
+                )
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].id").value(tripId))
+                .andExpect(jsonPath("$[0].userId").value(expectedUserId));
+
+        mockMvc.perform(
+                        get("/api/v1/trips/" + tripId)
+                                .header("Authorization", "Bearer " + token)
+                )
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(tripId));
+
+        mockMvc.perform(
+                        delete("/api/v1/trips/" + tripId)
+                                .header("Authorization", "Bearer " + token)
+                )
+                .andExpect(status().isNoContent());
 
         assertTrue(tripRepository.findById(tripId).isEmpty(), "El viaje debe eliminarse de la base de datos");
     }
@@ -84,6 +149,10 @@ class TripIntegrationTest {
         long tripId = createTrip(ownerToken);
         String otherToken = tokenFor("trip_other_it");
 
-        mockMvc.perform(get("/api/v1/trips/" + tripId).header("Authorization", "Bearer " + otherToken)).andExpect(status().isNotFound());
+        mockMvc.perform(
+                        get("/api/v1/trips/" + tripId)
+                                .header("Authorization", "Bearer " + otherToken)
+                )
+                .andExpect(status().isNotFound());
     }
 }

@@ -52,10 +52,27 @@ class BookingQueryServiceImplTest {
     void searchBookings_withCustomerIdAndStatus_filtersByBoth() {
 
         // Arrange
-        when(bookingRepository.findByUserIdAndStatus(eq(42L), eq("confirmed"), any(Pageable.class))).thenReturn(emptyPage);
+        when(
+                bookingRepository.findByUserIdAndStatus(
+                        eq(42L),
+                        eq("confirmed"),
+                        any(Pageable.class)
+                )
+        ).thenReturn(emptyPage);
 
         // Act
-        var result = service.searchBookings(new SearchBookingsQuery(42L, null, "confirmed", null, null, 0, 20), pageable);
+        var result = service.searchBookings(
+                new SearchBookingsQuery(
+                        42L,
+                        null,
+                        "confirmed",
+                        null,
+                        null,
+                        0,
+                        20
+                ),
+                pageable
+        );
 
         // Assert
         assertTrue(result.isEmpty());
@@ -99,7 +116,14 @@ class BookingQueryServiceImplTest {
         LocalDateTime fromDateTime = from.atStartOfDay();
         LocalDateTime toDateTime = to.atTime(23, 59, 59);
 
-        when(bookingRepository.findByUserIdAndStartDateBetween(eq(42L), eq(fromDateTime), eq(toDateTime), any(Pageable.class))).thenReturn(emptyPage);
+        when(
+                bookingRepository.findByUserIdAndStartDateBetween(
+                        eq(42L),
+                        eq(fromDateTime),
+                        eq(toDateTime),
+                        any(Pageable.class)
+                )
+        ).thenReturn(emptyPage);
 
         // Act
         var result = service.searchBookings(new SearchBookingsQuery(42L, null, null, from, to, 0, 20), pageable);
@@ -119,8 +143,21 @@ class BookingQueryServiceImplTest {
         var confirmedBooking = bookingWithStatus(2L, userId, "confirmed");
         var pendingPageable = PageRequest.of(0, 5);
 
-        when(bookingRepository.findByUserIdAndStatus(eq(userId), eq("pending"), any(Pageable.class))).thenReturn(new PageImpl<>(List.of(pendingBooking)));
-        when(bookingRepository.findByUserIdAndStatus(eq(userId), eq("confirmed"), any(Pageable.class))).thenReturn(new PageImpl<>(List.of(confirmedBooking)));
+        when(
+                bookingRepository.findByUserIdAndStatus(
+                        eq(userId),
+                        eq("pending"),
+                        any(Pageable.class)
+                )
+        ).thenReturn(new PageImpl<>(List.of(pendingBooking)));
+
+        when(
+                bookingRepository.findByUserIdAndStatus(
+                        eq(userId),
+                        eq("confirmed"),
+                        any(Pageable.class)
+                )
+        ).thenReturn(new PageImpl<>(List.of(confirmedBooking)));
 
         // Act
         var result = service.getPendingBookingsByUser(new GetPendingBookingsByUserQuery(userId), PageRequest.of(0, 10));
@@ -142,8 +179,21 @@ class BookingQueryServiceImplTest {
         var userId = 7L;
         var requestedPageable = PageRequest.of(0, 10);
 
-        when(bookingRepository.findByUserIdAndStatus(eq(userId), eq("pending"), any(Pageable.class))).thenReturn(new PageImpl<>(List.of()));
-        when(bookingRepository.findByUserIdAndStatus(eq(userId), eq("confirmed"), any(Pageable.class))).thenReturn(new PageImpl<>(List.of()));
+        when(
+                bookingRepository.findByUserIdAndStatus(
+                        eq(userId),
+                        eq("pending"),
+                        any(Pageable.class)
+                )
+        ).thenReturn(new PageImpl<>(List.of()));
+
+        when(
+                bookingRepository.findByUserIdAndStatus(
+                        eq(userId),
+                        eq("confirmed"),
+                        any(Pageable.class)
+                )
+        ).thenReturn(new PageImpl<>(List.of()));
 
         // Act
         service.getPendingBookingsByUser(new GetPendingBookingsByUserQuery(userId), requestedPageable);
@@ -152,7 +202,11 @@ class BookingQueryServiceImplTest {
         ArgumentCaptor<String> statusCaptor = ArgumentCaptor.forClass(String.class);
         ArgumentCaptor<Pageable> pageableCaptor = ArgumentCaptor.forClass(Pageable.class);
 
-        verify(bookingRepository, times(2)).findByUserIdAndStatus(eq(userId), statusCaptor.capture(), pageableCaptor.capture());
+        verify(bookingRepository, times(2)).findByUserIdAndStatus(
+                eq(userId),
+                statusCaptor.capture(),
+                pageableCaptor.capture()
+        );
 
         assertEquals(List.of("pending", "confirmed"), statusCaptor.getAllValues());
 
@@ -162,6 +216,11 @@ class BookingQueryServiceImplTest {
     }
 
     private Booking bookingWithStatus(Long bookingId, Long userId, String status) {
-        Booking booking = new Booking(); booking.setUserId(userId); booking.setStatus(status); booking.setBookingId(bookingId); return booking;
+        Booking booking = new Booking();
+        booking.setUserId(userId);
+        booking.setStatus(status);
+        booking.setBookingId(bookingId);
+
+        return booking;
     }
 }

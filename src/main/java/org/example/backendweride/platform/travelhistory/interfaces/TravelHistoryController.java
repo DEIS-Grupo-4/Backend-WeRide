@@ -60,9 +60,18 @@ public class TravelHistoryController {
             @ApiResponse(responseCode = "201", description = "Travel history created successfully"),
             @ApiResponse(responseCode = "404", description = "Related entity not found")
     })
-    public ResponseEntity<TravelHistoryResource> createTravelHistory(@RequestBody CreateTravelHistoryResource travelHistoryResource) {
+    public ResponseEntity<TravelHistoryResource> createTravelHistory(
+            @RequestBody CreateTravelHistoryResource travelHistoryResource
+    ) {
         Long userId = authenticatedAccountProvider.getCurrentAccountId();
-        var result = travelHistoryCommandService.handle(CreateTravelHistoryCommandFromResourceAssembler.toCommandFronResource(userId, travelHistoryResource));
+
+        var result = travelHistoryCommandService.handle(
+                CreateTravelHistoryCommandFromResourceAssembler.toCommandFronResource(
+                        userId,
+                        travelHistoryResource
+                )
+        );
+
         return result.map(travelHistory -> new ResponseEntity<>(
                 TravelHistoryResourceFromEntityAssembler.toTravelHistoryFromEntity(travelHistory), CREATED
         )).orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).build());
@@ -83,7 +92,9 @@ public class TravelHistoryController {
         if (!authenticatedAccountProvider.isCurrentUserAdmin()) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
-        var result = travelHistoryQueryService.handle(new org.example.backendweride.platform.travelhistory.domain.model.queries.GetAllTravelsHistory());
+        var result = travelHistoryQueryService.handle(
+                new org.example.backendweride.platform.travelhistory.domain.model.queries.GetAllTravelsHistory()
+        );
         return result.map(response -> new ResponseEntity<>(response, HttpStatus.OK))
                 .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).build());
     }
@@ -94,7 +105,9 @@ public class TravelHistoryController {
      * @return ResponseEntity containing the list of travel history records for the current user.
      */
     @GetMapping("/me")
-    @Operation(summary = "Get Travel History of the authenticated user", description = "Retrieve travel history records for the authenticated user")
+    @Operation(summary = "Get Travel History of the authenticated user",
+            description = "Retrieve travel history records for the authenticated user"
+    )
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Travel history found"),
             @ApiResponse(responseCode = "404", description = "Travel history not found")
@@ -114,7 +127,9 @@ public class TravelHistoryController {
      * @return ResponseEntity containing the list of travel history records or 404.
      */
     @GetMapping("{userId}")
-    @Operation(summary = "Get Travel History by User ID", description = "Retrieve travel history records for a specific user by their ID (own records only)")
+    @Operation(summary = "Get Travel History by User ID",
+            description = "Retrieve travel history records for a specific user by their ID (own records only)"
+    )
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Travel history found"),
             @ApiResponse(responseCode = "404", description = "Travel history not found")

@@ -34,21 +34,29 @@ public class LocationController {
         this.locationCommandService = locationCommandService;
     }
     @PostMapping
-    @Operation(summary = "Crear location", description = "Crea una nueva ubicación. Devuelve 201 con Location header y sin cuerpo.")
+    @Operation(
+            summary = "Crear location",
+            description = "Crea una nueva ubicación. Devuelve 201 con Location header y sin cuerpo."
+    )
     @ApiResponses({
             @ApiResponse(responseCode = "201", description = "Created - Location header con URI del recurso"),
             @ApiResponse(responseCode = "400", description = "Bad Request - payload inválido"),
             @ApiResponse(responseCode = "404", description = "Not Found - no se pudo crear")
     })
     public ResponseEntity<LocationResource> createLocation(@RequestBody CreateLocationResource locationResource) {
-        var result = this.locationCommandService.handle(CreateLocationCommandFromResourceAssembler.toCommandFromResource(locationResource));
+        var result = this.locationCommandService.handle(
+                CreateLocationCommandFromResourceAssembler.toCommandFromResource(locationResource)
+        );
         return result.map(LocationResourceFromEntityAssembler::toResourceFromEntity)
                 .map(resource -> ResponseEntity.status(HttpStatus.CREATED).body(resource))
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     @GetMapping
-    @Operation(summary = "Obtener todas las locations", description = "Devuelve 200 con la lista o 204 No Content si no hay resultados.")
+    @Operation(
+            summary = "Obtener todas las locations",
+            description = "Devuelve 200 con la lista o 204 No Content si no hay resultados."
+    )
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "OK - lista de locations"),
             @ApiResponse(responseCode = "204", description = "No Content - no hay locations"),
@@ -70,15 +78,24 @@ public class LocationController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<LocationResource> updateLocation(@PathVariable Long id, @RequestBody CreateLocationResource resource) {
-        return locationCommandService.handle(id, CreateLocationCommandFromResourceAssembler.toCommandFromResource(resource))
+    public ResponseEntity<LocationResource> updateLocation(
+            @PathVariable Long id,
+            @RequestBody CreateLocationResource resource
+    ) {
+        return locationCommandService.handle(
+                id,
+                        CreateLocationCommandFromResourceAssembler.toCommandFromResource(resource)
+                )
                 .map(LocationResourceFromEntityAssembler::toResourceFromEntity)
                 .map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<LocationResource> patchLocation(@PathVariable Long id, @RequestBody CreateLocationResource resource) {
+    public ResponseEntity<LocationResource> patchLocation(
+            @PathVariable Long id,
+            @RequestBody CreateLocationResource resource
+    ) {
         return updateLocation(id, resource);
     }
 

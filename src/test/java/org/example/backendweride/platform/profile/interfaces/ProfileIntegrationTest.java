@@ -36,8 +36,17 @@ class ProfileIntegrationTest {
         mockMvc.perform(post("/api/v1/authentication/sign-up").contentType(MediaType.APPLICATION_JSON).content("""
                 {"username":"%s","password":"Strong123!"}""".formatted(username))).andExpect(status().isCreated());
 
-        String response = mockMvc.perform(post("/api/v1/authentication/sign-in").contentType(MediaType.APPLICATION_JSON).content("""
-                {"username":"%s","password":"Strong123!"}""".formatted(username))).andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
+        String response = mockMvc.perform(
+                        post("/api/v1/authentication/sign-in")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content("""
+                        {"username":"%s","password":"Strong123!"}
+                        """.formatted(username))
+                )
+                .andExpect(status().isOk())
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
 
         String token = objectMapper.readTree(response).path("token").asText();
         assertFalse(token.isBlank(), "El inicio de sesión debe devolver un JWT");
@@ -51,7 +60,12 @@ class ProfileIntegrationTest {
         String token = tokenFor(username);
         Long accountId = accountRepository.findByUserName(username).orElseThrow().getId();
 
-        mockMvc.perform(get("/api/v1/profiles/me").header("Authorization", "Bearer " + token)).andExpect(status().isOk()).andExpect(jsonPath("$.userId").value(accountId.intValue()));
+        mockMvc.perform(
+                        get("/api/v1/profiles/me")
+                                .header("Authorization", "Bearer " + token)
+                )
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.userId").value(accountId.intValue()));
 
         Profile profile = profileRepository.findByUserId(accountId).orElseThrow();
 
@@ -66,8 +80,22 @@ class ProfileIntegrationTest {
         String token = tokenFor(username);
         Long accountId = accountRepository.findByUserName(username).orElseThrow().getId();
 
-        mockMvc.perform(put("/api/v1/profiles/me").header("Authorization", "Bearer " + token).contentType(MediaType.APPLICATION_JSON).content("""
-                {"firstName": "Ada","lastName": "Lovelace","email": "ada.integration@example.test"}""")).andExpect(status().isOk()).andExpect(jsonPath("$.firstName").value("Ada")).andExpect(jsonPath("$.lastName").value("Lovelace")).andExpect(jsonPath("$.email").value("ada.integration@example.test"));
+        mockMvc.perform(
+                        put("/api/v1/profiles/me")
+                                .header("Authorization", "Bearer " + token)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content("""
+                        {
+                          "firstName": "Ada",
+                          "lastName": "Lovelace",
+                          "email": "ada.integration@example.test"
+                        }
+                        """)
+                )
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.firstName").value("Ada"))
+                .andExpect(jsonPath("$.lastName").value("Lovelace"))
+                .andExpect(jsonPath("$.email").value("ada.integration@example.test"));
 
         Profile persisted = profileRepository.findByUserId(accountId).orElseThrow();
 
@@ -86,6 +114,10 @@ class ProfileIntegrationTest {
 
         String otherUserToken = tokenFor("profile_other_it");
 
-        mockMvc.perform(get("/api/v1/profiles/" + profileId).header("Authorization", "Bearer " + otherUserToken)).andExpect(status().isNotFound());
+        mockMvc.perform(
+                        get("/api/v1/profiles/" + profileId)
+                                .header("Authorization", "Bearer " + otherUserToken)
+                )
+                .andExpect(status().isNotFound());
     }
 }
