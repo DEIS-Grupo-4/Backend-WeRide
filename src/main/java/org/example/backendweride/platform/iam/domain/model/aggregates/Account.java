@@ -45,6 +45,12 @@ public class Account extends AbstractAggregateRoot<Account> {
     @Getter
     private ProfileId profileId;
 
+    /**
+     * Creates an account using a username and password.
+     *
+     * @param username account username
+     * @param password account password
+     */
     public Account(String username, String password) {
         if (username == null || username.isBlank()) {
             throw new IllegalArgumentException("Username cannot be null or empty");
@@ -56,11 +62,23 @@ public class Account extends AbstractAggregateRoot<Account> {
         this.password = password;
     }
 
+    /**
+     * Creates an account associated with a profile.
+     *
+     * @param username account username
+     * @param password account password
+     * @param profileId identifier of the associated profile
+     */
     public Account(String username, String password, ProfileId profileId) {
         this(username, password);
         this.profileId = profileId;
     }
 
+    /**
+     * Creates an account using registration information.
+     *
+     * @param command account registration command
+     */
     public Account(SignUpCommand command) {
         if (command == null) {
             throw new IllegalArgumentException("SignUpCommand cannot be null");
@@ -75,6 +93,12 @@ public class Account extends AbstractAggregateRoot<Account> {
         this.password = command.password();
     }
 
+    /**
+     * Creates an account using a registration command and hashed password.
+     *
+     * @param command account registration command
+     * @param hashedPassword hashed account password
+     */
     public Account(SignUpCommand command, String hashedPassword) {
         if (command == null) {
             throw new IllegalArgumentException("SignUpCommand cannot be null");
@@ -89,11 +113,24 @@ public class Account extends AbstractAggregateRoot<Account> {
         this.password = hashedPassword;
     }
 
+    /**
+     * Creates an account with registration information and a profile.
+     *
+     * @param command account registration command
+     * @param hashedPassword hashed account password
+     * @param profileId identifier of the associated profile
+     */
     public Account(SignUpCommand command, String hashedPassword, ProfileId profileId) {
         this(command, hashedPassword);
         this.profileId = profileId;
     }
 
+    /**
+     * Updates the account password.
+     *
+     * @param password new account password
+     * @return the updated account
+     */
     public Account updatePassword(String password) {
         if (password == null || password.isBlank()) {
             throw new IllegalArgumentException("Password cannot be null or empty");
@@ -102,6 +139,12 @@ public class Account extends AbstractAggregateRoot<Account> {
         return this;
     }
 
+    /**
+     * Updates the account username.
+     *
+     * @param userName new account username
+     * @return the updated account
+     */
     public Account updateUserName(String userName) {
         if (userName == null || userName.isBlank()) {
             throw new IllegalArgumentException("Username cannot be null or empty");
@@ -110,6 +153,12 @@ public class Account extends AbstractAggregateRoot<Account> {
         return this;
     }
 
+    /**
+     * Updates the profile associated with the account.
+     *
+     * @param profileId new profile identifier
+     * @return the updated account
+     */
     public Account updateProfileId(ProfileId profileId) {
         if (profileId == null) {
             throw new IllegalArgumentException("ProfileId cannot be null");
@@ -118,6 +167,12 @@ public class Account extends AbstractAggregateRoot<Account> {
         return this;
     }
 
+    /**
+     * Assigns a role to the account.
+     *
+     * @param role role to be assigned
+     * @return the updated account
+     */
     public Account assignRole(String role) {
         if (role == null || role.isBlank()) {
             throw new IllegalArgumentException("Role cannot be null or empty");

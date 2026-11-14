@@ -27,6 +27,13 @@ public class TripController {
     private final TripQueryService tripQueryService;
     private final AuthenticatedAccountProvider authenticatedAccountProvider;
 
+    /**
+     * Creates the trip controller with its application services.
+     *
+     * @param tripCommandService service for trip commands
+     * @param tripQueryService service for trip queries
+     * @param authenticatedAccountProvider provider of the authenticated account
+     */
     public TripController(
             TripCommandService tripCommandService,
             TripQueryService tripQueryService,
@@ -37,6 +44,12 @@ public class TripController {
         this.authenticatedAccountProvider = authenticatedAccountProvider;
     }
 
+    /**
+     * Creates a new trip for the authenticated user.
+     *
+     * @param createTripCommandResource information required to create the trip
+     * @return response containing the created trip
+     */
     @PostMapping
     public ResponseEntity<TripResource> createTrip(@RequestBody CreateTripCommandResource createTripCommandResource) {
         var userId = String.valueOf(authenticatedAccountProvider.getCurrentAccountId());
@@ -47,6 +60,11 @@ public class TripController {
                 )).orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).build());
     }
 
+    /**
+     * Retrieves the trips associated with the authenticated user.
+     *
+     * @return response containing the user's trips
+     */
     @GetMapping
     public ResponseEntity<List<TripResource>> getAllTrips() {
         var result = this.tripQueryService.handle(String.valueOf(authenticatedAccountProvider.getCurrentAccountId()));
@@ -55,6 +73,12 @@ public class TripController {
         )).orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).build());
     }
 
+    /**
+     * Retrieves a trip by its identifier.
+     *
+     * @param id trip identifier
+     * @return response containing the requested trip
+     */
     @GetMapping("/{id}")
     public ResponseEntity<TripResource> getTripById(@PathVariable Long id) {
         return tripQueryService.handle(id, String.valueOf(authenticatedAccountProvider.getCurrentAccountId()))
@@ -62,6 +86,13 @@ public class TripController {
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
+    /**
+     * Updates an existing trip.
+     *
+     * @param id trip identifier
+     * @param resource information used to update the trip
+     * @return response containing the updated trip
+     */
     @PatchMapping("/{id}")
     public ResponseEntity<TripResource> updateTrip(@PathVariable Long id, @RequestBody UpdateTripResource resource) {
         String userId = String.valueOf(authenticatedAccountProvider.getCurrentAccountId());
@@ -71,6 +102,12 @@ public class TripController {
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
+    /**
+     * Deletes a trip by its identifier.
+     *
+     * @param id trip identifier
+     * @return response indicating whether the trip was deleted
+     */
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteTripById(@PathVariable Long id) {
         boolean deleted = this.tripCommandService.handle(

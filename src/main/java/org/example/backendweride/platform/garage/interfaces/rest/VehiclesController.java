@@ -28,12 +28,20 @@ public class VehiclesController {
     private final VehicleCommandService vehicleCommandService;
     private final VehicleQueryService vehicleQueryService;
 
+    /**
+     * Creates the vehicle controller with its application services.
+     */
     public VehiclesController(VehicleCommandService vehicleCommandService, VehicleQueryService vehicleQueryService) {
         this.vehicleCommandService = vehicleCommandService;
         this.vehicleQueryService = vehicleQueryService;
     }
 
-    // 1. POST: Crear
+    /**
+     * Creates a new vehicle.
+     *
+     * @param resource vehicle information to be created
+     * @return response containing the creation result
+     */
     @PostMapping
     public ResponseEntity<VehicleResource> createVehicle(@Valid @RequestBody CreateVehicleResource resource) {
         var command = CreateVehicleCommandFromResourceAssembler.toCommandFromResource(resource);
@@ -50,7 +58,11 @@ public class VehiclesController {
                 .orElseGet(() -> ResponseEntity.badRequest().build());
     }
 
-    // 2. GET: Listar Todos
+    /**
+     * Retrieves all registered vehicles.
+     *
+     * @return response containing the available vehicles
+     */
     @GetMapping
     public ResponseEntity<List<VehicleResource>> getAllVehicles() {
         var getAllVehiclesQuery = new GetAllVehiclesQuery();
@@ -63,7 +75,12 @@ public class VehiclesController {
         return ResponseEntity.ok(resources);
     }
 
-    // 3. GET: Buscar por ID
+    /**
+     * Retrieves a vehicle by its identifier.
+     *
+     * @param id vehicle identifier
+     * @return response containing the requested vehicle
+     */
     @GetMapping("/{id}")
     public ResponseEntity<VehicleResource> getVehicleById(@PathVariable Long id) {
         var getVehicleByIdQuery = new GetVehicleByIdQuery(id);
@@ -76,7 +93,13 @@ public class VehiclesController {
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
-    // 4. PUT: Actualizar
+    /**
+     * Updates an existing vehicle.
+     *
+     * @param id vehicle identifier
+     * @param resource updated vehicle information
+     * @return response containing the update result
+     */
     @PutMapping("/{id}")
     public ResponseEntity<VehicleResource> updateVehicle(
             @PathVariable Long id,
@@ -92,7 +115,12 @@ public class VehiclesController {
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
-    // 5. DELETE: Eliminar (NUEVO)
+    /**
+     * Deletes a vehicle by its identifier.
+     *
+     * @param id vehicle identifier
+     * @return response indicating the deletion result
+     */
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteVehicle(@PathVariable Long id) {
         var deleteVehicleCommand = new DeleteVehicleCommand(id);

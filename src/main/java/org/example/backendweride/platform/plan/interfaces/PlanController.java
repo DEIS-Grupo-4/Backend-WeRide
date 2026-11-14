@@ -24,11 +24,23 @@ public class PlanController {
     private final PlanCommandService planCommandService;
     private final PlanQueryService planQueryService;
 
+    /**
+     * Creates the plan controller with its application services.
+     *
+     * @param planCommandService service for plan commands
+     * @param planQueryService service for plan queries
+     */
     public PlanController(PlanCommandService planCommandService, PlanQueryService planQueryService) {
         this.planCommandService = planCommandService;
         this.planQueryService = planQueryService;
     }
 
+    /**
+     * Creates a new subscription plan.
+     *
+     * @param planResource information required to create the plan
+     * @return response containing the created plan
+     */
     @PostMapping
     public ResponseEntity<PlanResource> createPlan(@RequestBody CreatePlanResource planResource) {
         var result = this.planCommandService.handle(
@@ -40,6 +52,12 @@ public class PlanController {
 
     }
 
+    /**
+     * Retrieves a subscription plan by its identifier.
+     *
+     * @param id plan identifier
+     * @return response containing the requested plan
+     */
     @GetMapping("/{id}")
     public ResponseEntity<PlanResource> findPlanById(@PathVariable Long id) {
         var result = this.planQueryService.handle(new GetPlanById(id));
@@ -48,6 +66,11 @@ public class PlanController {
         )).orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).build());
     }
 
+    /**
+     * Retrieves all available subscription plans.
+     *
+     * @return response containing the available plans
+     */
     @GetMapping
     public ResponseEntity<List<PlanResource>> findAllPlans() {
         var result = this.planQueryService.handle();
@@ -56,6 +79,13 @@ public class PlanController {
                 )).orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).build());
     }
 
+    /**
+     * Updates an existing subscription plan.
+     *
+     * @param id plan identifier
+     * @param resource updated plan information
+     * @return response containing the updated plan
+     */
     @PutMapping("/{id}")
     public ResponseEntity<PlanResource> updatePlan(@PathVariable Long id, @RequestBody CreatePlanResource resource) {
         return planCommandService.handle(id, CreatePlanCommandFronResourceAssembler.toCommandFromResource(resource))
@@ -64,6 +94,12 @@ public class PlanController {
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
+    /**
+     * Deletes a subscription plan by its identifier.
+     *
+     * @param id plan identifier
+     * @return response indicating the deletion result
+     */
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deletePlanById(@PathVariable Long id) {
         boolean deleted = this.planCommandService.handle(id);

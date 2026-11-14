@@ -31,6 +31,13 @@ public class NotificationsController {
     private final NotificationQueryService notificationQueryService;
     private final AuthenticatedAccountProvider authenticatedAccountProvider;
 
+    /**
+     * Creates the notifications controller with its application services.
+     *
+     * @param notificationCommandService service for notification commands
+     * @param notificationQueryService service for notification queries
+     * @param authenticatedAccountProvider provider of the authenticated account
+     */
     public NotificationsController(
             NotificationCommandService notificationCommandService,
             NotificationQueryService notificationQueryService,
@@ -41,6 +48,12 @@ public class NotificationsController {
         this.authenticatedAccountProvider = authenticatedAccountProvider;
     }
 
+    /**
+     * Creates a notification for the authenticated user.
+     *
+     * @param resource information required to create the notification
+     * @return response containing the created notification
+     */
     @PostMapping
     public ResponseEntity<NotificationResource> createNotification(@RequestBody CreateNotificationResource resource) {
         var command = CreateNotificationCommandFromResourceAssembler.toCommandFromResource(
@@ -87,6 +100,12 @@ public class NotificationsController {
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
+    /**
+     * Marks a notification as read.
+     *
+     * @param notificationId identifier of the notification to update
+     * @return response indicating the read status update
+     */
     @PatchMapping("/{notificationId}/read")
     public ResponseEntity<String> markAsRead(@PathVariable String notificationId) {
         var command = new MarkNotificationAsReadCommand(
@@ -97,6 +116,11 @@ public class NotificationsController {
         return ResponseEntity.ok("Notification marked as read");
     }
 
+    /**
+     * Updates an existing notification belonging to the authenticated user.
+     *
+     * @return response containing the updated notification
+     */
     @PatchMapping("/{notificationId}")
     public ResponseEntity<NotificationResource> updateNotification(
             @PathVariable String notificationId,
@@ -110,6 +134,12 @@ public class NotificationsController {
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
+    /**
+     * Deletes a notification belonging to the authenticated user.
+     *
+     * @param notificationId identifier of the notification to delete
+     * @return response indicating the deletion result
+     */
     @DeleteMapping("/{notificationId}")
     public ResponseEntity<Void> deleteNotification(@PathVariable String notificationId) {
         return notificationCommandService.delete(

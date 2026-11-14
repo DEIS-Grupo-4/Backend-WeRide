@@ -20,20 +20,80 @@ import java.util.Optional;
 @Repository
 public interface BookingRepository extends JpaRepository<Booking, Long> {
 
+    /**
+     * Finds a booking using its business identifier.
+     *
+     * @param bookingId booking business identifier
+     * @return optional matching booking
+     */
     Optional<Booking> findByBookingId(Long bookingId);
 
+    /**
+     * Finds bookings belonging to a user.
+     *
+     * @param userId user identifier
+     * @param pageable pagination and sorting information
+     * @return page of user bookings
+     */
     Page<Booking> findByUserId(Long userId, Pageable pageable);
 
+    /**
+     * Finds a user's bookings matching a specific status.
+     *
+     * @param userId user identifier
+     * @param status booking status
+     * @param pageable pagination and sorting information
+     * @return page of matching bookings
+     */
     Page<Booking> findByUserIdAndStatus(Long userId, String status, Pageable pageable);
 
+    /**
+     * Finds bookings matching a specific status.
+     *
+     * @param status booking status
+     * @param pageable pagination and sorting information
+     * @return page of matching bookings
+     */
     Page<Booking> findByStatus(String status, Pageable pageable);
 
+    /**
+     * Finds bookings whose start dates fall within a date range.
+     *
+     * @param from beginning of the date range
+     * @param to end of the date range
+     * @param pageable pagination and sorting information
+     * @return page of bookings within the date range
+     */
     Page<Booking> findByStartDateBetween(LocalDateTime from, LocalDateTime to, Pageable pageable);
 
+    /**
+     * Finds bookings associated with a vehicle.
+     *
+     * @param vehicleId vehicle identifier
+     * @param pageable pagination and sorting information
+     * @return page of vehicle bookings
+     */
     Page<Booking> findByVehicleId(Long vehicleId, Pageable pageable);
 
+    /**
+     * Finds bookings associated with a user and vehicle.
+     *
+     * @param userId user identifier
+     * @param vehicleId vehicle identifier
+     * @param pageable pagination and sorting information
+     * @return page of matching bookings
+     */
     Page<Booking> findByUserIdAndVehicleId(Long userId, Long vehicleId, Pageable pageable);
 
+    /**
+     * Finds a user's bookings within a specified start date range.
+     *
+     * @param userId user identifier
+     * @param from beginning of the date range
+     * @param to end of the date range
+     * @param pageable pagination and sorting information
+     * @return page of matching bookings
+     */
     Page<Booking> findByUserIdAndStartDateBetween(Long userId, LocalDateTime from, LocalDateTime to, Pageable pageable);
 
     /**

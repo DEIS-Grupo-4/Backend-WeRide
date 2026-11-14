@@ -2,7 +2,7 @@ package org.example.backendweride.platform.shared.interfaces.rest;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
-import org.springframework.validation.BindException;
+import org.springframework.validation.FieldError;
 import org.springframework.validation.MapBindingResult;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.core.MethodParameter;
@@ -15,6 +15,8 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 class GlobalExceptionHandlerTest {
 
     private final GlobalExceptionHandler handler = new GlobalExceptionHandler();
+
+    private void validationTarget(String brand) { }
 
     @Test
     void mapsIllegalArgumentExceptionToNotFound() {
@@ -37,26 +39,48 @@ class GlobalExceptionHandlerTest {
 
     @Test
     void mapsInvalidCredentialsRuntimeExceptionToUnauthorized() {
-        var response = handler.handleRuntimeException(new RuntimeException("Invalid credentials"));
+
+        // Arrange
+        var exception = new RuntimeException("Invalid credentials");
+
+        // Act
+        var response = handler.handleRuntimeException(exception);
+
+        // Assert
         assertEquals(HttpStatus.UNAUTHORIZED, response.getStatusCode());
+        assertEquals("Invalid credentials", response.getBody());
     }
 
     @Test
-    void unrecognizedRuntimeExceptionFallsBackToInternalServerError() {
-        assertThrows(RuntimeException.class,
-                () -> handler.handleRuntimeException(new RuntimeException("Something unexpected")));
+    void rethrowsUnrecognizedRuntimeException() {
+        assertThrows(
+                RuntimeException.class,
+                () -> handler.handleRuntimeException(
+                        new RuntimeException("Something unexpected")
+                )
+        );
     }
 
     @Test
     void mapsValidationExceptionToBadRequestWithFieldErrors() throws NoSuchMethodException {
-        var target = new Object();
-        var bindingResult = new MapBindingResult(new HashMap<>(), "resource");
-        bindingResult.addError(new org.springframework.validation.FieldError("resource", "brand", "must not be blank"));
-        MethodParameter param = new MethodParameter(this.getClass().getDeclaredMethod("mapsValidationExceptionToBadRequestWithFieldErrors"), -1);
-        var ex = new MethodArgumentNotValidException(param, bindingResult);
 
-        var response = handler.handleValidation(ex);
+        // Arrange
+        var bindingResult = new MapBindingResult(new HashMap<>(), "resource");
+
+        bindingResult.addError(new FieldError("resource", "brand", "must not be blank"));
+
+        MethodParameter param = new MethodParameter(
+                this.getClass().getDeclaredMethod("validationTarget", String.class),
+                0
+        );
+
+        var exception = new MethodArgumentNotValidException(param, bindingResult);
+
+        // Act
+        var response = handler.handleValidation(exception);
+
+        // Assert
         assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
-        assertEquals(true, response.getBody().contains("brand"));
+        assertEquals("brand: must not be blank", response.getBody());
     }
 }

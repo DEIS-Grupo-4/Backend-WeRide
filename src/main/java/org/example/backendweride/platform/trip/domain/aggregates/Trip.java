@@ -46,6 +46,11 @@ public class Trip {
     @OneToMany(mappedBy = "trip", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<TripRouteCoordinate> routeCoordinateEntities = new ArrayList<>();
 
+    /**
+     * Retrieves the route coordinates associated with this trip.
+     *
+     * @return list of route coordinates
+     */
     public List<RouteCoordinates> getRouteCoordinates() {
         return routeCoordinateEntities.stream()
                 .map(c -> new RouteCoordinates(c.getLat(), c.getLng()))
@@ -80,6 +85,11 @@ public class Trip {
     @OneToMany(mappedBy = "trip", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<TripIncidentReport> incidentReportEntities = new ArrayList<>();
 
+    /**
+     * Retrieves the incident reports associated with this trip.
+     *
+     * @return list of incident report descriptions
+     */
     public List<String> getIncidentReports() {
         return incidentReportEntities.stream().map(TripIncidentReport::getIncidentReport).collect(Collectors.toList());
     }
@@ -87,6 +97,11 @@ public class Trip {
     @OneToMany(mappedBy = "trip", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<TripPhoto> photoEntities = new ArrayList<>();
 
+    /**
+     * Retrieves the photos associated with this trip.
+     *
+     * @return list of trip photo references
+     */
     public List<String> getPhotos() {
         return photoEntities.stream().map(TripPhoto::getPhoto).collect(Collectors.toList());
     }
@@ -95,10 +110,20 @@ public class Trip {
 
     }
 
+    /**
+     * Creates a trip using the information provided by a command.
+     *
+     * @param tripCommand command containing the trip information
+     */
     public Trip(CreateTripCommand tripCommand) {
         updateFrom(tripCommand);
     }
 
+    /**
+     * Initializes or updates the trip using creation command information.
+     *
+     * @param tripCommand command containing the new trip information
+     */
     public void updateFrom(CreateTripCommand tripCommand) {
         this.userId = tripCommand.userId();
         this.bookingId = tripCommand.bookingId();
@@ -123,6 +148,11 @@ public class Trip {
         this.photoEntities = toPhotoEntities(tripCommand.photos());
     }
 
+    /**
+     * Updates the trip using the supplied update command.
+     *
+     * @param command command containing the information to update
+     */
     public void updateFrom(UpdateTripCommand command) {
         if (command.bookingId() != null) bookingId = command.bookingId();
         if (command.vehicleId() != null) vehicleId = command.vehicleId();

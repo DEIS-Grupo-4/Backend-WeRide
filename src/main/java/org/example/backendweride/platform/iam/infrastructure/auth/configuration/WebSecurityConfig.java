@@ -37,6 +37,9 @@ public class WebSecurityConfig {
     private final BCryptHashingService hashingService;
     private final AuthenticationEntryPoint authenticationEntryPoint;
 
+    /**
+     * Creates the web security configuration with its authentication dependencies.
+     */
     public WebSecurityConfig(
             @Qualifier("defaultUserDetailsService") UserDetailsService userDetailsService,
             BearerTokenService tokenService,
@@ -48,16 +51,33 @@ public class WebSecurityConfig {
         this.authenticationEntryPoint = authenticationEntryPoint;
     }
 
+    /**
+     * Creates the bearer authentication request filter.
+     *
+     * @return configured bearer authentication filter
+     */
     @Bean
     public BearerAuthRequestFilter authRequestFilter() {
         return new BearerAuthRequestFilter(tokenService, userDetailsService);
     }
 
+    /**
+     * Exposes the application authentication manager.
+     *
+     * @param authConfig Spring Security authentication configuration
+     * @return configured authentication manager
+     * @throws Exception if the authentication manager cannot be obtained
+     */
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration authConfig) throws Exception {
         return authConfig.getAuthenticationManager();
     }
 
+    /**
+     * Creates the DAO authentication provider.
+     *
+     * @return configured DAO authentication provider
+     */
     @Bean
     public DaoAuthenticationProvider authenticationProvider() {
         var provider = new DaoAuthenticationProvider(hashingService);
@@ -65,9 +85,19 @@ public class WebSecurityConfig {
         return provider;
     }
 
+    /**
+     * Exposes the password encoder used by the application.
+     *
+     * @return configured password encoder
+     */
     @Bean
     public PasswordEncoder passwordEncoder() { return hashingService;}
 
+    /**
+     * Creates the CORS configuration source.
+     *
+     * @return configured CORS configuration source
+     */
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
@@ -88,6 +118,13 @@ public class WebSecurityConfig {
         return source;
     }
 
+    /**
+     * Configures the application's HTTP security filter chain.
+     *
+     * @param http HTTP security configuration
+     * @return configured security filter chain
+     * @throws Exception if the security filter chain cannot be configured
+     */
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http.cors(cors -> cors.configurationSource(corsConfigurationSource()));

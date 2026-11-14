@@ -24,11 +24,23 @@ public class UnlockRequestController {
     private final UnlockRequestRepository repository;
     private final AuthenticatedAccountProvider accountProvider;
 
+    /**
+     * Creates the unlock request controller with its repository and account provider.
+     *
+     * @param repository repository for unlock request persistence
+     * @param accountProvider provider of the authenticated account
+     */
     public UnlockRequestController(UnlockRequestRepository repository, AuthenticatedAccountProvider accountProvider) {
         this.repository = repository;
         this.accountProvider = accountProvider;
     }
 
+    /**
+     * Retrieves unlock requests belonging to the authenticated user,
+     * optionally filtering them by booking.
+     *
+     * @return response containing the user's unlock requests
+     */
     @GetMapping
     public ResponseEntity<List<UnlockRequestResource>> getAll(
             @RequestParam(required = false) String userId,
@@ -40,6 +52,12 @@ public class UnlockRequestController {
         return ResponseEntity.ok(requests.stream().map(this::toResource).toList());
     }
 
+    /**
+     * Creates a new unlock request for the authenticated user.
+     *
+     * @param resource information required to create the unlock request
+     * @return response containing the created unlock request
+     */
     @PostMapping
     public ResponseEntity<UnlockRequestResource> create(@RequestBody CreateUnlockRequestResource resource) {
         var request = new UnlockRequest(
@@ -50,12 +68,25 @@ public class UnlockRequestController {
         return ResponseEntity.status(201).body(toResource(repository.save(request)));
     }
 
+    /**
+     * Retrieves an unlock request by its identifier if it belongs to the current user.
+     *
+     * @param id unlock request identifier
+     * @return response containing the requested unlock request
+     */
     @GetMapping("/{id}")
     public ResponseEntity<UnlockRequestResource> getById(@PathVariable String id) {
         return owned(id).map(request -> ResponseEntity.ok(toResource(request)))
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
+    /**
+     * Updates an existing unlock request owned by the authenticated user.
+     *
+     * @param id unlock request identifier
+     * @param resource updated unlock request information
+     * @return response containing the updated unlock request
+     */
     @PatchMapping("/{id}")
     public ResponseEntity<UnlockRequestResource> update(
             @PathVariable String id,
@@ -69,6 +100,12 @@ public class UnlockRequestController {
         }).orElseGet(() -> ResponseEntity.notFound().build());
     }
 
+    /**
+     * Deletes an unlock request belonging to the authenticated user.
+     *
+     * @param id unlock request identifier
+     * @return response indicating the deletion result
+     */
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable String id) {
         return owned(id).map(request -> {

@@ -22,10 +22,13 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 @RestController
 @RequestMapping(value = "/api/v1/location", produces = APPLICATION_JSON_VALUE)
 @Tag(name = "Locations", description = "Manage garage/pickup locations")
-public class LocationController {
+public class    LocationController {
     private final LocationCommandService locationCommandService;
     private final LocationQueryService locationQueryService;
 
+    /**
+     * Creates the location controller with its application services.
+     */
     public LocationController(
             LocationCommandService locationCommandService,
             LocationQueryService locationQueryService
@@ -43,6 +46,13 @@ public class LocationController {
             @ApiResponse(responseCode = "400", description = "Bad Request - payload inválido"),
             @ApiResponse(responseCode = "404", description = "Not Found - no se pudo crear")
     })
+
+    /**
+     * Creates a new location.
+     *
+     * @param locationResource location information to be created
+     * @return response containing the creation result
+     */
     public ResponseEntity<LocationResource> createLocation(@RequestBody CreateLocationResource locationResource) {
         var result = this.locationCommandService.handle(
                 CreateLocationCommandFromResourceAssembler.toCommandFromResource(locationResource)
@@ -62,6 +72,12 @@ public class LocationController {
             @ApiResponse(responseCode = "204", description = "No Content - no hay locations"),
             @ApiResponse(responseCode = "404", description = "Not Found - error de consulta")
     })
+
+    /**
+     * Retrieves all registered locations.
+     *
+     * @return response containing the available locations
+     */
     public ResponseEntity<List<LocationResource>> getAllLocation() {
         var result = this.locationQueryService.handle();
         return result.map(response ->
@@ -70,6 +86,12 @@ public class LocationController {
 
     }
 
+    /**
+     * Retrieves a location by its identifier.
+     *
+     * @param id location identifier
+     * @return response containing the requested location
+     */
     @GetMapping("/{id}")
     public ResponseEntity<LocationResource> getLocation(@PathVariable Long id) {
         return locationQueryService.handle(id)
@@ -77,6 +99,13 @@ public class LocationController {
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
+    /**
+     * Updates an existing location.
+     *
+     * @param id location identifier
+     * @param resource updated location information
+     * @return response containing the update result
+     */
     @PutMapping("/{id}")
     public ResponseEntity<LocationResource> updateLocation(
             @PathVariable Long id,
@@ -91,6 +120,13 @@ public class LocationController {
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
+    /**
+     * Applies an update to an existing location.
+     *
+     * @param id location identifier
+     * @param resource location information to be updated
+     * @return response containing the update result
+     */
     @PatchMapping("/{id}")
     public ResponseEntity<LocationResource> patchLocation(
             @PathVariable Long id,
@@ -99,6 +135,12 @@ public class LocationController {
         return updateLocation(id, resource);
     }
 
+    /**
+     * Deletes a location by its identifier.
+     *
+     * @param id location identifier
+     * @return response indicating the deletion result
+     */
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteLocation(@PathVariable Long id) {
         return locationCommandService.delete(id)
