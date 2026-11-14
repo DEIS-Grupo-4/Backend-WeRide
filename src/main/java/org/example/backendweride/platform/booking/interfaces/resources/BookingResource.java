@@ -34,5 +34,6 @@ public record BookingResource(
     RatingResource rating,
     List<String> issues
 ) {
-    public record RatingResource(Integer score, String comment) {}
+    public record RatingResource(Integer score, String comment) {
+    }
 }

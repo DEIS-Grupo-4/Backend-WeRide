@@ -36,6 +36,10 @@ import org.example.backendweride.platform.booking.domain.model.queries.GetBookin
 import org.example.backendweride.platform.booking.domain.model.queries.SearchBookingsQuery;
 import org.example.backendweride.platform.booking.domain.model.queries.GetBookingDraftsByCustomerQuery;
 import org.example.backendweride.platform.iam.application.internal.outboundservices.security.AuthenticatedAccountProvider;
+import org.example.backendweride.platform.booking.domain.model.queries.GetBookingsByUserIdQuery;
+import org.example.backendweride.platform.booking.domain.model.queries.GetPendingBookingsByUserQuery;
+import org.example.backendweride.platform.booking.domain.model.queries.GetCompletedBookingsByUserQuery;
+import org.example.backendweride.platform.booking.interfaces.transform.BookingResourceFromEntityAssembler;
 
 import java.util.Optional;
 import java.time.LocalDate;
@@ -109,7 +113,10 @@ public class BookingController {
         var result = commandService.createBooking(cmd);
         if (!result.success()) return ResponseEntity.badRequest().build();
 
-        Optional<BookingResource> resp = bookingQueryService.getBookingById(new GetBookingByIdQuery(result.bookingId()));
+        Optional<BookingResource> resp =
+                bookingQueryService.getBookingById(
+                        new GetBookingByIdQuery(result.bookingId())
+                );
         return resp.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
 
@@ -132,18 +139,25 @@ public class BookingController {
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<BookingResource> updateBooking(@PathVariable Long id, @RequestBody UpdateBookingResource resource) {
+    public ResponseEntity<BookingResource> updateBooking(
+            @PathVariable Long id,
+            @RequestBody UpdateBookingResource resource
+    ) {
         var updated = commandService.updateBooking(
                 id,
                 authenticatedAccountProvider.getCurrentAccountId(),
                 UpdateBookingCommandFromResourceAssembler.toCommand(resource));
-        return updated.map(org.example.backendweride.platform.booking.interfaces.transform.BookingResourceFromEntityAssembler::toResource)
+        return updated
+                .map(BookingResourceFromEntityAssembler::toResource)
                 .map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<BookingResource> replaceBooking(@PathVariable Long id, @RequestBody UpdateBookingResource resource) {
+    public ResponseEntity<BookingResource> replaceBooking(
+            @PathVariable Long id,
+            @RequestBody UpdateBookingResource resource
+    ) {
         return updateBooking(id, resource);
     }
 
@@ -189,7 +203,15 @@ public class BookingController {
             return ResponseEntity.badRequest().build();
         }
 
-        SearchBookingsQuery q = new SearchBookingsQuery(authenticatedAccountProvider.getCurrentAccountId(), vehicleId, status, from, to, page, size);
+        SearchBookingsQuery q = new SearchBookingsQuery(
+                authenticatedAccountProvider.getCurrentAccountId(),
+                vehicleId,
+                status,
+                from,
+                to,
+                page,
+                size
+        );
         Pageable pageable = PageRequest.of(Math.max(0, page), Math.max(1, size));
         var results = bookingQueryService.searchBookings(q, pageable);
         return ResponseEntity.ok(results);
@@ -203,7 +225,10 @@ public class BookingController {
      * @return ResponseEntity containing a page of booking drafts for the customer.
      */
     @GetMapping("/drafts")
-    @Operation(summary = "Get booking drafts by customer", description = "Retrieve booking drafts for a specific customer")
+    @Operation(
+            summary = "Get booking drafts by customer",
+            description = "Retrieve booking drafts for a specific customer"
+    )
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Booking drafts retrieved successfully"),
             @ApiResponse(responseCode = "400", description = "Invalid customer ID")
@@ -213,7 +238,11 @@ public class BookingController {
         @RequestParam(defaultValue = "0") int page,
         @RequestParam(defaultValue = "20") int size
     ) {
-        GetBookingDraftsByCustomerQuery q = new GetBookingDraftsByCustomerQuery(authenticatedAccountProvider.getCurrentAccountId(), page, size);
+        GetBookingDraftsByCustomerQuery q = new GetBookingDraftsByCustomerQuery(
+                authenticatedAccountProvider.getCurrentAccountId(),
+                page,
+                size
+        );
         Pageable pageable = PageRequest.of(Math.max(0, page), Math.max(1, size));
         var results = bookingQueryService.getBookingDraftsByCustomer(q, pageable);
         return ResponseEntity.ok(results);
@@ -282,7 +311,10 @@ public class BookingController {
             @ApiResponse(responseCode = "400", description = "Invalid request")
     })
     public ResponseEntity<String> deleteDraft(@PathVariable Long draftId) {
-        DeleteBookingDraftCommand cmd = new DeleteBookingDraftCommand(draftId, authenticatedAccountProvider.getCurrentAccountId());
+        DeleteBookingDraftCommand cmd = new DeleteBookingDraftCommand(
+                draftId,
+                authenticatedAccountProvider.getCurrentAccountId()
+        );
         var result = draftService.deleteDraft(cmd);
 
         if (!result.success()) {
@@ -310,7 +342,9 @@ public class BookingController {
         @RequestParam(defaultValue = "0") int page,
         @RequestParam(defaultValue = "20") int size
     ) {
-        var q = new org.example.backendweride.platform.booking.domain.model.queries.GetBookingsByUserIdQuery(authenticatedAccountProvider.getCurrentAccountId());
+        var q = new GetBookingsByUserIdQuery(
+                authenticatedAccountProvider.getCurrentAccountId()
+        );
         Pageable pageable = PageRequest.of(Math.max(0, page), Math.max(1, size));
         var results = bookingQueryService.getBookingsByUserId(q, pageable);
         return ResponseEntity.ok(results);
@@ -334,7 +368,9 @@ public class BookingController {
         @RequestParam(defaultValue = "0") int page,
         @RequestParam(defaultValue = "20") int size
     ) {
-        var q = new org.example.backendweride.platform.booking.domain.model.queries.GetPendingBookingsByUserQuery(authenticatedAccountProvider.getCurrentAccountId());
+        var q = new GetPendingBookingsByUserQuery(
+                authenticatedAccountProvider.getCurrentAccountId()
+        );
         Pageable pageable = PageRequest.of(Math.max(0, page), Math.max(1, size));
         var results = bookingQueryService.getPendingBookingsByUser(q, pageable);
         return ResponseEntity.ok(results);
@@ -348,7 +384,9 @@ public class BookingController {
      * @return ResponseEntity containing a page of completed bookings for the user.
      */
     @GetMapping("/user/{userId}/completed")
-    @Operation(summary = "Get completed bookings by user", description = "Retrieve completed bookings for a specific user")
+    @Operation(summary = "Get completed bookings by user",
+            description = "Retrieve completed bookings for a specific user"
+    )
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Completed bookings retrieved successfully"),
             @ApiResponse(responseCode = "400", description = "Invalid user ID")
@@ -358,7 +396,9 @@ public class BookingController {
         @RequestParam(defaultValue = "0") int page,
         @RequestParam(defaultValue = "20") int size
     ) {
-        var q = new org.example.backendweride.platform.booking.domain.model.queries.GetCompletedBookingsByUserQuery(authenticatedAccountProvider.getCurrentAccountId());
+        var q = new GetCompletedBookingsByUserQuery(
+                authenticatedAccountProvider.getCurrentAccountId()
+        );
         Pageable pageable = PageRequest.of(Math.max(0, page), Math.max(1, size));
         var results = bookingQueryService.getCompletedBookingsByUser(q, pageable);
         return ResponseEntity.ok(results);

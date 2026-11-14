@@ -32,8 +32,11 @@ public class BookingCommandServiceImpl implements BookingCommandService {
             List.of("confirmed", "in_progress", "pending");
 
     private final BookingRepository bookingRepository;
+
     private final VehicleRepository vehicleRepository;
+
     private final LocationRepository locationRepository;
+
     private final NotificationContextFacade notificationContextFacade;
 
     public BookingCommandServiceImpl(BookingRepository bookingRepository,

@@ -41,13 +41,13 @@ public class BookingQueryServiceImpl implements BookingQueryService {
     @Override
     public Page<BookingResource> getBookingsByCustomer(GetBookingsByCustomerQuery q, Pageable pageable) {
         var page = bookingRepository.findByUserId(q.customerId(), pageable);
-        return new PageImpl<>(page.stream().map(BookingResourceFromEntityAssembler::toResource).collect(Collectors.toList()), pageable, page.getTotalElements());
+        return page.map(BookingResourceFromEntityAssembler::toResource);
     }
 
     @Override
     public Page<BookingResource> getBookingDraftsByCustomer(GetBookingDraftsByCustomerQuery q, Pageable pageable) {
         var page = bookingRepository.findByUserIdAndStatus(q.customerId(), "draft", pageable);
-        return new PageImpl<>(page.stream().map(BookingResourceFromEntityAssembler::toResource).collect(Collectors.toList()), pageable, page.getTotalElements());
+        return page.map(BookingResourceFromEntityAssembler::toResource);
     }
 
     @Override
@@ -55,7 +55,7 @@ public class BookingQueryServiceImpl implements BookingQueryService {
         LocalDateTime from = q.from().atStartOfDay();
         LocalDateTime to = q.to().atTime(23, 59, 59);
         var page = bookingRepository.findByStartDateBetween(from, to, pageable);
-        return new PageImpl<>(page.stream().map(BookingResourceFromEntityAssembler::toResource).collect(Collectors.toList()), pageable, page.getTotalElements());
+        return page.map(BookingResourceFromEntityAssembler::toResource);
     }
 
     @Override
@@ -64,47 +64,47 @@ public class BookingQueryServiceImpl implements BookingQueryService {
 
         if (q.status() != null) {
             var page = bookingRepository.findByUserIdAndStatus(q.customerId(), q.status(), pageable);
-            return new PageImpl<>(page.stream().map(BookingResourceFromEntityAssembler::toResource).collect(Collectors.toList()), pageable, page.getTotalElements());
+            return page.map(BookingResourceFromEntityAssembler::toResource);
         }
 
         if (q.vehicleId() != null) {
             var page = bookingRepository.findByUserIdAndVehicleId(q.customerId(), q.vehicleId(), pageable);
-            return new PageImpl<>(page.stream().map(BookingResourceFromEntityAssembler::toResource).collect(Collectors.toList()), pageable, page.getTotalElements());
+            return page.map(BookingResourceFromEntityAssembler::toResource);
         }
 
         if (q.startAtFrom() != null && q.startAtTo() != null) {
             LocalDateTime from = q.startAtFrom().atStartOfDay();
             LocalDateTime to = q.startAtTo().atTime(23, 59, 59);
             var page = bookingRepository.findByUserIdAndStartDateBetween(q.customerId(), from, to, pageable);
-            return new PageImpl<>(page.stream().map(BookingResourceFromEntityAssembler::toResource).collect(Collectors.toList()), pageable, page.getTotalElements());
+            return page.map(BookingResourceFromEntityAssembler::toResource);
         }
 
         var page = bookingRepository.findByUserId(q.customerId(), pageable);
-        return new PageImpl<>(page.stream().map(BookingResourceFromEntityAssembler::toResource).collect(Collectors.toList()), pageable, page.getTotalElements());
+        return page.map(BookingResourceFromEntityAssembler::toResource);
     }
 
     @Override
     public Page<BookingResource> getAllBookings(GetAllBookingsQuery q, Pageable pageable) {
         var all = bookingRepository.findAll(pageable);
-        return new PageImpl<>(all.stream().map(BookingResourceFromEntityAssembler::toResource).collect(Collectors.toList()), pageable, all.getTotalElements());
+        return all.map(BookingResourceFromEntityAssembler::toResource);
     }
 
     @Override
     public Page<BookingResource> getBookingsByVehicle(GetBookingsByVehicleQuery q, Pageable pageable) {
         var page = bookingRepository.findByUserIdAndVehicleId(q.userId(), q.vehicleId(), pageable);
-        return new PageImpl<>(page.stream().map(BookingResourceFromEntityAssembler::toResource).collect(Collectors.toList()), pageable, page.getTotalElements());
+        return page.map(BookingResourceFromEntityAssembler::toResource);
     }
 
     @Override
     public Page<BookingResource> getBookingsByStatus(GetBookingsByStatusQuery q, Pageable pageable) {
         var page = bookingRepository.findByUserIdAndStatus(q.userId(), q.status(), pageable);
-        return new PageImpl<>(page.stream().map(BookingResourceFromEntityAssembler::toResource).collect(Collectors.toList()), pageable, page.getTotalElements());
+        return page.map(BookingResourceFromEntityAssembler::toResource);
     }
 
     @Override
     public Page<BookingResource> getBookingsByUserId(GetBookingsByUserIdQuery q, Pageable pageable) {
         var page = bookingRepository.findByUserId(q.userId(), pageable);
-        return new PageImpl<>(page.stream().map(BookingResourceFromEntityAssembler::toResource).collect(Collectors.toList()), pageable, page.getTotalElements());
+        return page.map(BookingResourceFromEntityAssembler::toResource);
     }
 
     @Override
@@ -130,6 +130,6 @@ public class BookingQueryServiceImpl implements BookingQueryService {
     @Override
     public Page<BookingResource> getCompletedBookingsByUser(GetCompletedBookingsByUserQuery q, Pageable pageable) {
         var page = bookingRepository.findByUserIdAndStatus(q.userId(), "completed", pageable);
-        return new PageImpl<>(page.stream().map(BookingResourceFromEntityAssembler::toResource).collect(Collectors.toList()), pageable, page.getTotalElements());
+        return page.map(BookingResourceFromEntityAssembler::toResource);
     }
 }

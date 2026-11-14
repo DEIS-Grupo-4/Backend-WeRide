@@ -23,4 +23,5 @@ public record UpdateBookingCommand(
         Double averageSpeed,
         Integer ratingScore,
         String ratingComment
-) {}
+) {
+}

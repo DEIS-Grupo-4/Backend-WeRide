@@ -13,7 +13,8 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 @OpenAPIDefinition(
         info = @Info(
                 title = "WeRide",
-                description = "API backend de WeRide para la gestión de vehículos, reservas, viajes, ubicaciones y usuarios."
+                description = "API backend de WeRide para la gestión de vehículos, reservas, viajes, "
+                        + "ubicaciones y usuarios."
         )
 )
 

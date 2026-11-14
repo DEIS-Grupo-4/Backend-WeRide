@@ -47,7 +47,12 @@ class BookingControllerTest {
 
         // Arrange
         when(authenticatedAccountProvider.getCurrentAccountId()).thenReturn(42L);
-        when(bookingQueryService.getBookingsByUserId(any(GetBookingsByUserIdQuery.class), any(Pageable.class))).thenReturn(EMPTY_PAGE);
+        when(
+                bookingQueryService.getBookingsByUserId(
+                        any(GetBookingsByUserIdQuery.class),
+                        any(Pageable.class)
+                )
+        ).thenReturn(EMPTY_PAGE);
 
         // Act
         var response = controller.getBookingsByUserId(999L, 0, 20);
@@ -68,7 +73,12 @@ class BookingControllerTest {
 
         // Arrange
         when(authenticatedAccountProvider.getCurrentAccountId()).thenReturn(42L);
-        when(bookingQueryService.getPendingBookingsByUser(any(GetPendingBookingsByUserQuery.class), any(Pageable.class))).thenReturn(EMPTY_PAGE);
+        when(
+                bookingQueryService.getPendingBookingsByUser(
+                        any(GetPendingBookingsByUserQuery.class),
+                        any(Pageable.class)
+                )
+        ).thenReturn(EMPTY_PAGE);
 
         // Act
         var response = controller.getPendingBookingsByUser(999L, 0, 20);
@@ -77,7 +87,8 @@ class BookingControllerTest {
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertNotNull(response.getBody());
 
-        ArgumentCaptor<GetPendingBookingsByUserQuery> captor = ArgumentCaptor.forClass(GetPendingBookingsByUserQuery.class);
+        ArgumentCaptor<GetPendingBookingsByUserQuery> captor =
+                ArgumentCaptor.forClass(GetPendingBookingsByUserQuery.class);
 
         verify(bookingQueryService).getPendingBookingsByUser(captor.capture(), any(Pageable.class));
 
@@ -89,7 +100,12 @@ class BookingControllerTest {
 
         // Arrange
         when(authenticatedAccountProvider.getCurrentAccountId()).thenReturn(42L);
-        when(bookingQueryService.getCompletedBookingsByUser(any(GetCompletedBookingsByUserQuery.class), any(Pageable.class))).thenReturn(EMPTY_PAGE);
+        when(
+                bookingQueryService.getCompletedBookingsByUser(
+                        any(GetCompletedBookingsByUserQuery.class),
+                        any(Pageable.class)
+                )
+        ).thenReturn(EMPTY_PAGE);
 
         // Act
         var response = controller.getCompletedBookingsByUser(999L, 0, 20);
@@ -98,7 +114,8 @@ class BookingControllerTest {
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertNotNull(response.getBody());
 
-        ArgumentCaptor<GetCompletedBookingsByUserQuery> captor = ArgumentCaptor.forClass(GetCompletedBookingsByUserQuery.class);
+        ArgumentCaptor<GetCompletedBookingsByUserQuery> captor =
+                ArgumentCaptor.forClass(GetCompletedBookingsByUserQuery.class);
 
         verify(bookingQueryService).getCompletedBookingsByUser(captor.capture(), any(Pageable.class));
 
@@ -110,7 +127,12 @@ class BookingControllerTest {
 
         // Arrange
         when(authenticatedAccountProvider.getCurrentAccountId()).thenReturn(42L);
-        when(bookingQueryService.getBookingDraftsByCustomer(any(GetBookingDraftsByCustomerQuery.class), any(Pageable.class))).thenReturn(EMPTY_PAGE);
+        when(
+                bookingQueryService.getBookingDraftsByCustomer(
+                        any(GetBookingDraftsByCustomerQuery.class),
+                        any(Pageable.class)
+                )
+        ).thenReturn(EMPTY_PAGE);
 
         // Act
         var response = controller.getDraftsByCustomer(999L, 0, 20);
@@ -119,7 +141,8 @@ class BookingControllerTest {
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertNotNull(response.getBody());
 
-        ArgumentCaptor<GetBookingDraftsByCustomerQuery> captor = ArgumentCaptor.forClass(GetBookingDraftsByCustomerQuery.class);
+        ArgumentCaptor<GetBookingDraftsByCustomerQuery> captor =
+                ArgumentCaptor.forClass(GetBookingDraftsByCustomerQuery.class);
 
         verify(bookingQueryService).getBookingDraftsByCustomer(captor.capture(), any(Pageable.class));
 
@@ -131,7 +154,14 @@ class BookingControllerTest {
 
         // Arrange
         when(authenticatedAccountProvider.getCurrentAccountId()).thenReturn(42L);
-        when(draftService.deleteDraft(any(DeleteBookingDraftCommand.class))).thenReturn(new BookingCommandService.SaveDraftResult(555L, true, "Draft deleted successfully"));
+        when(draftService.deleteDraft(any(DeleteBookingDraftCommand.class)))
+                .thenReturn(
+                        new BookingCommandService.SaveDraftResult(
+                                555L,
+                                true,
+                                "Draft deleted successfully"
+                        )
+                );
 
         // Act
         var response = controller.deleteDraft(555L);
@@ -149,7 +179,30 @@ class BookingControllerTest {
     }
 
     private static BookingResource bookingResource(Long id, Long userId) {
-        return new BookingResource(id, id, userId, 1L, 1L, 1L, null, null, null, null, null, "confirmed", null, null, null, null, null, null, null, null, null, List.of());
+        return new BookingResource(
+                id,
+                id,
+                userId,
+                1L,
+                1L,
+                1L,
+                null,
+                null,
+                null,
+                null,
+                null,
+                "confirmed",
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                List.of()
+        );
     }
 
     @Test
@@ -157,7 +210,8 @@ class BookingControllerTest {
 
         // Arrange
         when(authenticatedAccountProvider.getCurrentAccountId()).thenReturn(42L);
-        when(bookingQueryService.getBookingById(any(GetBookingByIdQuery.class))).thenReturn(Optional.of(bookingResource(7L, 999L)));
+        when(bookingQueryService.getBookingById(any(GetBookingByIdQuery.class)))
+                .thenReturn(Optional.of(bookingResource(7L, 999L)));
 
         // Act
         var response = controller.getBookingById(7L);
@@ -174,7 +228,8 @@ class BookingControllerTest {
 
         // Arrange
         when(authenticatedAccountProvider.getCurrentAccountId()).thenReturn(42L);
-        when(bookingQueryService.getBookingById(any(GetBookingByIdQuery.class))).thenReturn(Optional.of(bookingResource(7L, 42L)));
+        when(bookingQueryService.getBookingById(any(GetBookingByIdQuery.class)))
+                .thenReturn(Optional.of(bookingResource(7L, 42L)));
 
         // Act
         var response = controller.getBookingById(7L);
@@ -193,7 +248,12 @@ class BookingControllerTest {
 
         // Arrange
         when(authenticatedAccountProvider.getCurrentAccountId()).thenReturn(42L);
-        when(bookingQueryService.searchBookings(any(SearchBookingsQuery.class), any(Pageable.class))).thenReturn(EMPTY_PAGE);
+        when(
+                bookingQueryService.searchBookings(
+                        any(SearchBookingsQuery.class),
+                        any(Pageable.class)
+                )
+        ).thenReturn(EMPTY_PAGE);
 
         // Act
         var response = controller.searchBookings(999L, "confirmed", "2026-01-01", "2026-01-31", 0, 20);
@@ -216,7 +276,12 @@ class BookingControllerTest {
 
         // Arrange
         when(authenticatedAccountProvider.getCurrentAccountId()).thenReturn(42L);
-        when(bookingQueryService.getBookingsByVehicle(any(GetBookingsByVehicleQuery.class), any(Pageable.class))).thenReturn(EMPTY_PAGE);
+        when(
+                bookingQueryService.getBookingsByVehicle(
+                        any(GetBookingsByVehicleQuery.class),
+                        any(Pageable.class)
+                )
+        ).thenReturn(EMPTY_PAGE);
 
         // Act
         var response = controller.getBookingsByVehicle(5L, 0, 20);
@@ -237,7 +302,12 @@ class BookingControllerTest {
 
         // Arrange
         when(authenticatedAccountProvider.getCurrentAccountId()).thenReturn(42L);
-        when(bookingQueryService.getBookingsByStatus(any(GetBookingsByStatusQuery.class), any(Pageable.class))).thenReturn(EMPTY_PAGE);
+        when(
+                bookingQueryService.getBookingsByStatus(
+                        any(GetBookingsByStatusQuery.class),
+                        any(Pageable.class)
+                )
+        ).thenReturn(EMPTY_PAGE);
 
         // Act
         var response = controller.getBookingsByStatus("confirmed", 0, 20);
