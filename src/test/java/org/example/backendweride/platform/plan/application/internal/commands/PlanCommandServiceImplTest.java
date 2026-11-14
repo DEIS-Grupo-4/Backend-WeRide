@@ -26,7 +26,23 @@ class PlanCommandServiceImplTest {
     @InjectMocks private PlanCommandServiceImpl service;
 
     private static CreatePlanCommand sampleCommand(String name, float price) {
-        return new CreatePlanCommand(name, "Plan de pruebas", price, "PEN", 0.50f, "monthly", 30, 2, 60, 10, 0, List.of("Uso de vehículos"), "#18FA3A", false, true);
+        return new CreatePlanCommand(
+                name,
+                "Plan de pruebas",
+                price,
+                "PEN",
+                0.50f,
+                "monthly",
+                30,
+                2,
+                60,
+                10,
+                0,
+                List.of("Uso de vehículos"),
+                "#18FA3A",
+                false,
+                true
+        );
     }
 
     @Test

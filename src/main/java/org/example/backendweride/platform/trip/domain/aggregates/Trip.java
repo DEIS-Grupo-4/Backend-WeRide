@@ -129,7 +129,11 @@ public class Trip {
         if (command.startLocationId() != null) startLocationId = command.startLocationId();
         if (command.endLocationId() != null) endLocationId = command.endLocationId();
         if (command.route() != null) route = command.route();
-        if (command.routeCoordinates() != null) routeCoordinateEntities = toRouteCoordinateEntities(command.routeCoordinates());
+        if (command.routeCoordinates() != null) {
+            routeCoordinateEntities = toRouteCoordinateEntities(
+                    command.routeCoordinates()
+            );
+        }
         if (command.startDate() != null) startDate = command.startDate();
         if (command.endDate() != null) endDate = command.endDate();
         if (command.duration() != null) duration = command.duration();
@@ -142,7 +146,11 @@ public class Trip {
         if (command.weather() != null) weather = command.weather();
         if (command.temperature() != null) temperature = command.temperature();
         if (command.status() != null) status = command.status();
-        if (command.incidentReports() != null) incidentReportEntities = toIncidentReportEntities(command.incidentReports());
+        if (command.incidentReports() != null) {
+            incidentReportEntities = toIncidentReportEntities(
+                    command.incidentReports()
+            );
+        }
         if (command.photos() != null) photoEntities = toPhotoEntities(command.photos());
     }
 

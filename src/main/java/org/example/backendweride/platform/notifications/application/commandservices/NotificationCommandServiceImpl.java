@@ -36,7 +36,8 @@ public class NotificationCommandServiceImpl implements NotificationCommandServic
                     notificationRepository.save(notification);
                     return notification;
                 })
-                // ponytail: surfaces as 500 until P-10 adds a @RestControllerAdvice — deliberate, not a leak (same path for not-found and not-owned)
+                // ponytail: surfaces as 500 until P-10 adds a @RestControllerAdvice — deliberate,
+                // not a leak (same path for not-found and not-owned)
                 .orElseThrow(() -> new RuntimeException("Notification not found with ID: " + command.notificationId()));
     }
 

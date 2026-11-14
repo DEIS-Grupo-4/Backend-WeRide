@@ -26,7 +26,11 @@ public class ProfileController {
     private final ProfileQueryService profileQueryService;
     private final AuthenticatedAccountProvider authenticatedAccountProvider;
 
-    public ProfileController(ProfileCommandService profileCommandService, ProfileQueryService profileQueryService, AuthenticatedAccountProvider authenticatedAccountProvider) {
+    public ProfileController(
+            ProfileCommandService profileCommandService,
+            ProfileQueryService profileQueryService,
+            AuthenticatedAccountProvider authenticatedAccountProvider
+    ) {
         this.profileCommandService = profileCommandService;
         this.profileQueryService = profileQueryService;
         this.authenticatedAccountProvider = authenticatedAccountProvider;
@@ -36,7 +40,9 @@ public class ProfileController {
      * Creates (or upserts) the profile of the authenticated user.
      */
     @PostMapping
-    public ResponseEntity<ProfileResource> createProfile(@Valid @RequestBody CreateProfileCommandResource profileResource) {
+    public ResponseEntity<ProfileResource> createProfile(
+            @Valid @RequestBody CreateProfileCommandResource profileResource
+    ) {
         var userId = authenticatedAccountProvider.getCurrentAccountId();
         var result = this.profileCommandService.handle(
                 CreateProfileCommandFromResourceAssembler.toCommandFromResource(profileResource, userId));

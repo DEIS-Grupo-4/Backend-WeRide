@@ -73,7 +73,10 @@ public class TripController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteTripById(@PathVariable Long id) {
-        boolean deleted = this.tripCommandService.handle(id, String.valueOf(authenticatedAccountProvider.getCurrentAccountId()));
+        boolean deleted = this.tripCommandService.handle(
+                id,
+                String.valueOf(authenticatedAccountProvider.getCurrentAccountId())
+        );
         return deleted
                 ? ResponseEntity.status(HttpStatus.NO_CONTENT).build()
                 : ResponseEntity.status(HttpStatus.NOT_FOUND).build();

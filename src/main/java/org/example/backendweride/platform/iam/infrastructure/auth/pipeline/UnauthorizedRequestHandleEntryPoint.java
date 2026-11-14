@@ -21,7 +21,11 @@ public class UnauthorizedRequestHandleEntryPoint implements AuthenticationEntryP
     private static final Logger LOGGER = LoggerFactory.getLogger(UnauthorizedRequestHandleEntryPoint.class);
 
     @Override
-    public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authenticationException) throws IOException, ServletException {
+    public void commence(
+            HttpServletRequest request,
+            HttpServletResponse response,
+            AuthenticationException authenticationException
+    ) throws IOException, ServletException {
         LOGGER.warn("Unauthorized request: {}", authenticationException.getMessage());
         response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized");
     }

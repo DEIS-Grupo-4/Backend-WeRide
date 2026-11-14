@@ -53,7 +53,9 @@ public class TokenServiceImpl implements BearerTokenService {
     }
 
     private boolean isTokenPresentIn(String authorizationParameter) {
-        return authorizationParameter != null && authorizationParameter.toLowerCase().startsWith(BEARER_TOKEN_PREFIX.toLowerCase());
+        return authorizationParameter != null
+                && authorizationParameter.toLowerCase()
+                .startsWith(BEARER_TOKEN_PREFIX.toLowerCase());
     }
 
     private String extractTokenFrom(String authorizationParameter) {
@@ -78,7 +80,9 @@ public class TokenServiceImpl implements BearerTokenService {
     }
 
     private boolean isBearerTokenIn(String authorizationParameter) {
-        return authorizationParameter != null && authorizationParameter.toLowerCase().startsWith(BEARER_TOKEN_PREFIX.toLowerCase());
+        return authorizationParameter != null
+                && authorizationParameter.toLowerCase()
+                .startsWith(BEARER_TOKEN_PREFIX.toLowerCase());
     }
 
     @Override

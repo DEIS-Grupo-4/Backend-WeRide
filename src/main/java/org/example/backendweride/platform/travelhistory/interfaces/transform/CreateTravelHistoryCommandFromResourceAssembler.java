@@ -4,7 +4,10 @@ import org.example.backendweride.platform.travelhistory.domain.model.commands.Cr
 import org.example.backendweride.platform.travelhistory.interfaces.resources.CreateTravelHistoryResource;
 
 public class CreateTravelHistoryCommandFromResourceAssembler {
-    public static CreateTravelHistoryCommand toCommandFronResource(Long userId, CreateTravelHistoryResource travelHistoryResource) {
+    public static CreateTravelHistoryCommand toCommandFronResource(
+            Long userId,
+            CreateTravelHistoryResource travelHistoryResource
+    ) {
         return new CreateTravelHistoryCommand(
                 userId,
                 travelHistoryResource.location(),

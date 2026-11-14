@@ -22,7 +22,12 @@ public class AccountCommandServiceImpl implements AccountCommandService {
     private final TokenService tokenService;
     private final ProfileContextFacade profileContextFacade;
 
-    public AccountCommandServiceImpl(AccountRepository accountRepository, HashingService hashingService, TokenService tokenService, ProfileContextFacade profileContextFacade) {
+    public AccountCommandServiceImpl(
+            AccountRepository accountRepository,
+            HashingService hashingService,
+            TokenService tokenService,
+            ProfileContextFacade profileContextFacade
+    ) {
         this.accountRepository = accountRepository;
         this.hashingService = hashingService;
         this.tokenService = tokenService;

@@ -45,7 +45,10 @@ public class IamAuthController {
      * @return ResponseEntity containing the authenticated account resource or an error status.
      */
     @PostMapping("/sign-in")
-    @Operation(summary = "Sign in to the system", description = "Authenticate a user and return an authenticated account resource.")
+    @Operation(
+            summary = "Sign in to the system",
+            description = "Authenticate a user and return an authenticated account resource."
+    )
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successfully authenticated"),
             @ApiResponse(responseCode = "404", description = "Authentication failed, account not found")
@@ -57,7 +60,10 @@ public class IamAuthController {
         if(authenticatedAccountResult.isEmpty()) return ResponseEntity.notFound().build();
         var authenticatedAccount = authenticatedAccountResult.get();
         var authenticatedAccountResource =
-                AuthenticatedAccountResourceFromEntityAssembler.toResourceFromEntity(authenticatedAccount.left, authenticatedAccount.right);
+                AuthenticatedAccountResourceFromEntityAssembler.toResourceFromEntity(
+                        authenticatedAccount.left,
+                        authenticatedAccount.right
+                );
         return ResponseEntity.ok(authenticatedAccountResource);
     }
 

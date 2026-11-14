@@ -59,7 +59,8 @@ class JpaCollectionMappingTest {
         Vehicle loaded = vehicleRepository.findById(vehicle.getId()).orElseThrow();
         assertEquals(List.of("GPS", "Bluetooth", "Mobile App"), loaded.getFeatures());
 
-        loaded.updateInformation(new org.example.backendweride.platform.garage.domain.model.commands.UpdateVehicleCommand(
+        loaded.updateInformation(
+                new org.example.backendweride.platform.garage.domain.model.commands.UpdateVehicleCommand(
                 loaded.getId(), "Xiaomi", "M365", 2023, 82, 25, 30, 12.5, "black", "XM001", "1",
                 "available", "electric_scooter", "1", 0.5, "assets/vehicles/xiaomi-m365.jpg",
                 List.of("GPS", "LED Lights"), "good", new Date(), new Date(), 1250.5, 4.6));

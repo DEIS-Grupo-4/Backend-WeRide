@@ -192,7 +192,9 @@ public class BookingCommandServiceImpl implements BookingCommandService {
         return null;
     }
 
-    private boolean isVehicleAvailable(org.example.backendweride.platform.garage.domain.model.aggregates.Vehicle vehicle) {
+    private boolean isVehicleAvailable(
+            org.example.backendweride.platform.garage.domain.model.aggregates.Vehicle vehicle
+    ) {
         return vehicle.getStatus() == null || vehicle.getStatus().equalsIgnoreCase("available");
     }
 

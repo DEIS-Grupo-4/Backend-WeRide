@@ -31,7 +31,9 @@ public class PlanController {
 
     @PostMapping
     public ResponseEntity<PlanResource> createPlan(@RequestBody CreatePlanResource planResource) {
-        var result = this.planCommandService.handle(CreatePlanCommandFronResourceAssembler.toCommandFromResource(planResource));
+        var result = this.planCommandService.handle(
+                CreatePlanCommandFronResourceAssembler.toCommandFromResource(planResource)
+        );
         return result.map(response -> new ResponseEntity<>(
                 PlanResourceFromEntity.toPlanResource(response), HttpStatus.CREATED
         )).orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).build());

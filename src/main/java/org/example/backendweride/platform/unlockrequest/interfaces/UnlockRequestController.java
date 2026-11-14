@@ -57,7 +57,10 @@ public class UnlockRequestController {
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<UnlockRequestResource> update(@PathVariable String id, @RequestBody CreateUnlockRequestResource resource) {
+    public ResponseEntity<UnlockRequestResource> update(
+            @PathVariable String id,
+            @RequestBody CreateUnlockRequestResource resource
+    ) {
         return owned(id).map(request -> {
             request.update(resource.vehicleId(), resource.bookingId(), resource.scheduledUnlockTime(),
                     resource.actualUnlockTime(), resource.status(), resource.method(), resource.location(),

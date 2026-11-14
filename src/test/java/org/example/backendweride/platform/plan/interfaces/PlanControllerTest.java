@@ -32,8 +32,24 @@ class PlanControllerTest {
     void findAllPlans_returnsPlanResources() {
 
         // Arrange
-        PlanResource plan = new PlanResource(1L, "Premium", "Plan de prueba", 29.99f, "PEN", 0.5f, "monthly", 30, 2, 60, 10, 0, List.of("Reserva rápida"), "#18FA3A", false, true);
-
+        PlanResource plan = new PlanResource(
+                1L,
+                "Premium",
+                "Plan de prueba",
+                29.99f,
+                "PEN",
+                0.5f,
+                "monthly",
+                30,
+                2,
+                60,
+                10,
+                0,
+                List.of("Reserva rápida"),
+                "#18FA3A",
+                false,
+                true
+        );
         when(planQueryService.handle()).thenReturn(Optional.of(List.of(plan)));
 
         // Act

@@ -11,8 +11,17 @@ import org.springframework.security.core.userdetails.UserDetails;
  */
 public class UsernamePasswordAuthTokenBuilder {
     public static UsernamePasswordAuthenticationToken build(UserDetails principal, HttpServletRequest request){
-        var usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(principal, null, principal.getAuthorities());
-        usernamePasswordAuthenticationToken.setDetails(new org.springframework.security.web.authentication.WebAuthenticationDetailsSource().buildDetails(request));
+        var usernamePasswordAuthenticationToken =
+                new UsernamePasswordAuthenticationToken(
+                        principal,
+                        null,
+                        principal.getAuthorities()
+                );
+
+        usernamePasswordAuthenticationToken.setDetails(
+                new org.springframework.security.web.authentication.WebAuthenticationDetailsSource()
+                        .buildDetails(request)
+        );
         return usernamePasswordAuthenticationToken;
     }
 }

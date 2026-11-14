@@ -37,7 +37,16 @@ class TravelHistoryControllerTest {
     private TravelHistoryController controller;
 
     private TravelHistoryResource sampleTravelHistory() {
-        return new TravelHistoryResource(1L, 1L, "San Isidro", "Scooter", "travel-image.jpg", "30 minutos", "5 km", null);
+        return new TravelHistoryResource(
+                1L,
+                1L,
+                "San Isidro",
+                "Scooter",
+                "travel-image.jpg",
+                "30 minutos",
+                "5 km",
+                null
+        );
     }
 
     @Test
@@ -47,7 +56,9 @@ class TravelHistoryControllerTest {
         var history = sampleTravelHistory();
 
         when(authenticatedAccountProvider.isCurrentUserAdmin()).thenReturn(true);
-        when(travelHistoryQueryService.handle(any(GetAllTravelsHistory.class))).thenReturn(Optional.of(List.of(history)));
+        when(
+                travelHistoryQueryService.handle(any(GetAllTravelsHistory.class))
+        ).thenReturn(Optional.of(List.of(history)));
 
         // Act
         var response = controller.getAllTravelHistories();
@@ -85,7 +96,9 @@ class TravelHistoryControllerTest {
         var history = sampleTravelHistory();
 
         when(authenticatedAccountProvider.getCurrentAccountId()).thenReturn(1L);
-        when(travelHistoryQueryService.handle(any(GetTravelsHistoryById.class))).thenReturn(Optional.of(List.of(history)));
+        when(
+                travelHistoryQueryService.handle(any(GetTravelsHistoryById.class))
+        ).thenReturn(Optional.of(List.of(history)));
 
         // Act
         var response = controller.getTravelHistoryById(1L);

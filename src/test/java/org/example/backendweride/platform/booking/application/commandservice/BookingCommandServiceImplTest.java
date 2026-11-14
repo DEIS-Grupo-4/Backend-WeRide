@@ -45,7 +45,28 @@ class BookingCommandServiceImplTest {
         LocalDateTime now = LocalDateTime.now();
         LocalDateTime startDate = now.plusDays(1);
 
-        return new SaveBookingDraftCommand(1L, vehicleId, 2L, 3L, now, startDate, startDate.plusMinutes(30), null, null, "draft", null, null, null, "credit_card", "pending", null, 30, null, null, null);
+        return new SaveBookingDraftCommand(
+                1L,
+                vehicleId,
+                2L,
+                3L,
+                now,
+                startDate,
+                startDate.plusMinutes(30),
+                null,
+                null,
+                "draft",
+                null,
+                null,
+                null,
+                "credit_card",
+                "pending",
+                null,
+                30,
+                null,
+                null,
+                null
+        );
     }
 
     @Test

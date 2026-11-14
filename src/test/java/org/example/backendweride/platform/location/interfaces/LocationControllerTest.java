@@ -32,7 +32,21 @@ class LocationControllerTest {
     void getAllLocation_returnsLocationResources() {
 
         // Arrange
-        LocationResource location = new LocationResource(1L, "Estación principal", "Av. Principal 123", null, "pickup", 10, 4, true, null, List.of("charging"), "San Isidro", "Estación de prueba", "location-image.jpg");
+        LocationResource location = new LocationResource(
+                1L,
+                "Estación principal",
+                "Av. Principal 123",
+                null,
+                "pickup",
+                10,
+                4,
+                true,
+                null,
+                List.of("charging"),
+                "San Isidro",
+                "Estación de prueba",
+                "location-image.jpg"
+        );
         List<LocationResource> locations = List.of(location);
 
         when(locationQueryService.handle()).thenReturn(Optional.of(locations));

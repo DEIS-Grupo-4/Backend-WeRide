@@ -29,7 +29,10 @@ public class AccountsController {
     private final AccountQueryService accountQueryService;
     private final AuthenticatedAccountProvider authenticatedAccountProvider;
 
-    public AccountsController(AccountQueryService accountQueryService, AuthenticatedAccountProvider authenticatedAccountProvider) {
+    public AccountsController(
+            AccountQueryService accountQueryService,
+            AuthenticatedAccountProvider authenticatedAccountProvider
+    ) {
         this.accountQueryService = accountQueryService;
         this.authenticatedAccountProvider = authenticatedAccountProvider;
     }

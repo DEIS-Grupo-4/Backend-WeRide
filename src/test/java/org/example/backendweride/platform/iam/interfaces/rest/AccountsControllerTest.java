@@ -12,7 +12,11 @@ class AccountsControllerTest {
     private final AccountQueryService accountQueryService = mock(AccountQueryService.class);
     private final AuthenticatedAccountProvider authenticatedAccountProvider = mock(AuthenticatedAccountProvider.class);
 
-    private final AccountsController controller = new AccountsController(accountQueryService, authenticatedAccountProvider);
+    private final AccountsController controller =
+            new AccountsController(
+                    accountQueryService,
+                    authenticatedAccountProvider
+            );
 
     @Test
     void getAccountById_returnsNotFound_whenRequestingAnotherAccount() {

@@ -27,12 +27,31 @@ public class AuthenticationIntegrationTest {
     @Autowired AccountRepository accountRepository;
 
     private void register(String username) throws Exception {
-        mockMvc.perform(post("/api/v1/authentication/sign-up").contentType(MediaType.APPLICATION_JSON).content("{\"username\":\"" + username + "\",\"password\":\"Strong123!\"}")).andExpect(status().isCreated());
+        String credentials = "{\"username\":\"" + username
+                + "\",\"password\":\"Strong123!\"}";
+
+        mockMvc.perform(
+                post("/api/v1/authentication/sign-up")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(credentials)
+        ).andExpect(status().isCreated());
     }
 
     private String jwt(String username) throws Exception {
         register(username);
-        var response = mockMvc.perform(post("/api/v1/authentication/sign-in").contentType(MediaType.APPLICATION_JSON).content("{\"username\":\"" + username + "\",\"password\":\"Strong123!\"}")).andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
+
+        String credentials = "{\"username\":\"" + username
+                + "\",\"password\":\"Strong123!\"}";
+
+        var response = mockMvc.perform(
+                        post("/api/v1/authentication/sign-in")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(credentials)
+                )
+                .andExpect(status().isOk())
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
 
         JsonNode json = objectMapper.readTree(response);
         String token = json.path("token").asText();
