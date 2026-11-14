@@ -42,8 +42,12 @@ public class VehiclesController {
         var getVehicleByIdQuery = new GetVehicleByIdQuery(vehicleId);
         var vehicle = vehicleQueryService.handle(getVehicleByIdQuery);
 
-        return vehicle.map(value -> new ResponseEntity<>(VehicleResourceFromEntityAssembler.toResourceFromEntity(value), HttpStatus.CREATED)).orElseGet(() -> ResponseEntity.badRequest().build());
-
+        return vehicle
+                .map(value -> new ResponseEntity<>(
+                        VehicleResourceFromEntityAssembler.toResourceFromEntity(value),
+                        HttpStatus.CREATED
+                ))
+                .orElseGet(() -> ResponseEntity.badRequest().build());
     }
 
     // 2. GET: Listar Todos
@@ -65,18 +69,27 @@ public class VehiclesController {
         var getVehicleByIdQuery = new GetVehicleByIdQuery(id);
         var vehicle = vehicleQueryService.handle(getVehicleByIdQuery);
 
-        return vehicle.map(value -> ResponseEntity.ok(VehicleResourceFromEntityAssembler.toResourceFromEntity(value))).orElseGet(() -> ResponseEntity.notFound().build());
-
+        return vehicle
+                .map(value -> ResponseEntity.ok(
+                        VehicleResourceFromEntityAssembler.toResourceFromEntity(value)
+                ))
+                .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     // 4. PUT: Actualizar
     @PutMapping("/{id}")
-    public ResponseEntity<VehicleResource> updateVehicle(@PathVariable Long id, @RequestBody UpdateVehicleResource resource) {
+    public ResponseEntity<VehicleResource> updateVehicle(
+            @PathVariable Long id,
+            @RequestBody UpdateVehicleResource resource
+    ) {
         var command = UpdateVehicleCommandFromResourceAssembler.toCommandFromResource(id, resource);
         var updatedVehicle = vehicleCommandService.handle(command);
 
-        return updatedVehicle.map(vehicle -> ResponseEntity.ok(VehicleResourceFromEntityAssembler.toResourceFromEntity(vehicle))).orElseGet(() -> ResponseEntity.notFound().build());
-
+        return updatedVehicle
+                .map(vehicle -> ResponseEntity.ok(
+                        VehicleResourceFromEntityAssembler.toResourceFromEntity(vehicle)
+                ))
+                .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     // 5. DELETE: Eliminar (NUEVO)

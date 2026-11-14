@@ -52,7 +52,8 @@ class NotificationsControllerTest {
         assertNotNull(response.getBody());
         assertTrue(response.getBody().isEmpty());
 
-        ArgumentCaptor<GetAllNotificationsByUserIdQuery> captor = ArgumentCaptor.forClass(GetAllNotificationsByUserIdQuery.class);
+        ArgumentCaptor<GetAllNotificationsByUserIdQuery> captor =
+                ArgumentCaptor.forClass(GetAllNotificationsByUserIdQuery.class);
 
         verify(notificationQueryService).handle(captor.capture());
 
@@ -69,7 +70,11 @@ class NotificationsControllerTest {
 
         when(authenticatedAccountProvider.getCurrentAccountId()).thenReturn(42L);
         when(foreignNotification.getUserId()).thenReturn("999");
-        when(notificationQueryService.handle(any(GetNotificationByIdQuery.class))).thenReturn(Optional.of(foreignNotification));
+        when(
+                notificationQueryService.handle(
+                        any(GetNotificationByIdQuery.class)
+                )
+        ).thenReturn(Optional.of(foreignNotification));
 
         // Act
         var response = controller.getNotificationById("notif-001");
@@ -92,7 +97,8 @@ class NotificationsControllerTest {
         // Arrange
         when(authenticatedAccountProvider.getCurrentAccountId()).thenReturn(42L);
 
-        ArgumentCaptor<MarkNotificationAsReadCommand> captor = ArgumentCaptor.forClass(MarkNotificationAsReadCommand.class);
+        ArgumentCaptor<MarkNotificationAsReadCommand> captor =
+                ArgumentCaptor.forClass(MarkNotificationAsReadCommand.class);
 
         // Act
         var response = controller.markAsRead("notif-001");

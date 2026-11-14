@@ -27,12 +27,31 @@ public class PlanIntegrationTest {
     @Autowired PlanRepository planRepository;
 
     private void register(String username) throws Exception {
-        mockMvc.perform(post("/api/v1/authentication/sign-up").contentType(MediaType.APPLICATION_JSON).content("{\"username\":\"" + username + "\",\"password\":\"Strong123!\"}")).andExpect(status().isCreated());
+        String credentials = "{\"username\":\"" + username
+                + "\",\"password\":\"Strong123!\"}";
+
+        mockMvc.perform(
+                post("/api/v1/authentication/sign-up")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(credentials)
+        ).andExpect(status().isCreated());
     }
 
     private String jwt(String username) throws Exception {
         register(username);
-        var response = mockMvc.perform(post("/api/v1/authentication/sign-in").contentType(MediaType.APPLICATION_JSON).content("{\"username\":\"" + username + "\",\"password\":\"Strong123!\"}")).andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
+
+        String credentials = "{\"username\":\"" + username
+                + "\",\"password\":\"Strong123!\"}";
+
+        var response = mockMvc.perform(
+                        post("/api/v1/authentication/sign-in")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(credentials)
+                )
+                .andExpect(status().isOk())
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
 
         JsonNode json = objectMapper.readTree(response);
         String token = json.path("token").asText();
@@ -41,9 +60,25 @@ public class PlanIntegrationTest {
     }
 
     private String planJson() {
-        return """ 
-                { "name": "Premium QA", "description": "Plan de integración", "price": 29.99, "currency": "PEN", "pricePerMinute": 0.5, "duration": "monthly", "durationDays": 30, "maxTripsPerDay": 2, "maxMinutesPerTrip": 60, "freeMinutesPerMonth": 10, "discountPercentage": 0, "benefits": ["Reserva rápida"], "color": "#18FA3A", "isPopular": false, "isActive": true }
-        """;
+        return """
+            {
+              "name": "Premium QA",
+              "description": "Plan de integración",
+              "price": 29.99,
+              "currency": "PEN",
+              "pricePerMinute": 0.5,
+              "duration": "monthly",
+              "durationDays": 30,
+              "maxTripsPerDay": 2,
+              "maxMinutesPerTrip": 60,
+              "freeMinutesPerMonth": 10,
+              "discountPercentage": 0,
+              "benefits": ["Reserva rápida"],
+              "color": "#18FA3A",
+              "isPopular": false,
+              "isActive": true
+            }
+            """;
     }
 
     @Test
@@ -54,7 +89,12 @@ public class PlanIntegrationTest {
         var payload = planJson();
 
         // Act
-        var result = mockMvc.perform(post("/api/v1/plans").header("Authorization", "Bearer " + jwt).contentType(MediaType.APPLICATION_JSON).content(payload));
+        var result = mockMvc.perform(
+                post("/api/v1/plans")
+                        .header("Authorization", "Bearer " + jwt)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(payload)
+        );
 
         // Assert
         result.andExpect(status().isCreated()).andExpect(jsonPath("$.name").value("Premium QA"));
@@ -67,7 +107,13 @@ public class PlanIntegrationTest {
 
         // Arrange
         var jwt = jwt("planit02");
-        mockMvc.perform(post("/api/v1/plans").header("Authorization", "Bearer " + jwt).contentType(MediaType.APPLICATION_JSON).content(planJson())).andExpect(status().isCreated());
+        mockMvc.perform(
+                        post("/api/v1/plans")
+                                .header("Authorization", "Bearer " + jwt)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(planJson())
+                )
+                .andExpect(status().isCreated());
 
         // Act
         var result = mockMvc.perform(get("/api/v1/plans").header("Authorization", "Bearer " + jwt));

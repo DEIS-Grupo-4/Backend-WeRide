@@ -31,7 +31,11 @@ public class NotificationsController {
     private final NotificationQueryService notificationQueryService;
     private final AuthenticatedAccountProvider authenticatedAccountProvider;
 
-    public NotificationsController(NotificationCommandService notificationCommandService, NotificationQueryService notificationQueryService, AuthenticatedAccountProvider authenticatedAccountProvider) {
+    public NotificationsController(
+            NotificationCommandService notificationCommandService,
+            NotificationQueryService notificationQueryService,
+            AuthenticatedAccountProvider authenticatedAccountProvider
+    ) {
         this.notificationCommandService = notificationCommandService;
         this.notificationQueryService = notificationQueryService;
         this.authenticatedAccountProvider = authenticatedAccountProvider;
@@ -54,7 +58,9 @@ public class NotificationsController {
      */
     @GetMapping
     public ResponseEntity<List<NotificationResource>> getAllNotificationsByUserId(@RequestParam String userId) {
-        var query = new GetAllNotificationsByUserIdQuery(String.valueOf(authenticatedAccountProvider.getCurrentAccountId()));
+        var query = new GetAllNotificationsByUserIdQuery(
+                String.valueOf(authenticatedAccountProvider.getCurrentAccountId())
+        );
         var notifications = notificationQueryService.handle(query);
 
         var resources = notifications.stream()
@@ -73,14 +79,20 @@ public class NotificationsController {
         var notification = notificationQueryService.handle(query);
 
         return notification
-                .filter(entity -> String.valueOf(authenticatedAccountProvider.getCurrentAccountId()).equals(entity.getUserId()))
+                .filter(entity ->
+                        String.valueOf(authenticatedAccountProvider.getCurrentAccountId())
+                                .equals(entity.getUserId())
+                )
                 .map(entity -> ResponseEntity.ok(NotificationResourceFromEntityAssembler.toResourceFromEntity(entity)))
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     @PatchMapping("/{notificationId}/read")
     public ResponseEntity<String> markAsRead(@PathVariable String notificationId) {
-        var command = new MarkNotificationAsReadCommand(notificationId, String.valueOf(authenticatedAccountProvider.getCurrentAccountId()));
+        var command = new MarkNotificationAsReadCommand(
+                notificationId,
+                String.valueOf(authenticatedAccountProvider.getCurrentAccountId())
+        );
         notificationCommandService.handle(command);
         return ResponseEntity.ok("Notification marked as read");
     }

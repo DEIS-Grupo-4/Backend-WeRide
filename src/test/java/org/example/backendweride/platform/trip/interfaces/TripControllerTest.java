@@ -39,7 +39,30 @@ class TripControllerTest {
     private TripController controller;
 
     private TripResource sampleTripResource() {
-        return new TripResource(1L, 10L, "42", 2L, 3L, 4L, "route", List.of(), new Date(), new Date(), 10, 5f, 20f, 25f, 0f, 0f, 0, "sunny", 20, "active", List.of(), List.of());
+        return new TripResource(
+                1L,
+                10L,
+                "42",
+                2L,
+                3L,
+                4L,
+                "route",
+                List.of(),
+                new Date(),
+                new Date(),
+                10,
+                5f,
+                20f,
+                25f,
+                0f,
+                0f,
+                0,
+                "sunny",
+                20,
+                "active",
+                List.of(),
+                List.of()
+        );
     }
 
     @Test
@@ -101,11 +124,36 @@ class TripControllerTest {
     void createTrip_usesAuthenticatedUserIdNotResourceBody() {
 
         // Arrange
-        var resource = new CreateTripCommandResource(1L, "someone-else-id", 2L, 3L, 4L, "route", List.of(), new Date(), new Date(), 10, 5f, 20f, 25f, 0f, 0f, 0, "sunny", 20, "active", List.of(), List.of());
+        var resource = new CreateTripCommandResource(
+                1L,
+                "someone-else-id",
+                2L,
+                3L,
+                4L,
+                "route",
+                List.of(),
+                new Date(),
+                new Date(),
+                10,
+                5f,
+                20f,
+                25f,
+                0f,
+                0f,
+                0,
+                "sunny",
+                20,
+                "active",
+                List.of(),
+                List.of()
+        );
 
         when(authenticatedAccountProvider.getCurrentAccountId()).thenReturn(42L);
-        when(tripCommandService.handle(any(CreateTripCommand.class))).thenAnswer(invocation -> Optional.of(new Trip(invocation.getArgument(0))));
-
+        when(
+                tripCommandService.handle(any(CreateTripCommand.class))
+        ).thenAnswer(invocation ->
+                Optional.of(new Trip(invocation.getArgument(0)))
+        );
         ArgumentCaptor<CreateTripCommand> captor = ArgumentCaptor.forClass(CreateTripCommand.class);
 
         // Act
